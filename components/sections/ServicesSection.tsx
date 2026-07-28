@@ -1,0 +1,237 @@
+'use client';
+
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { SERVICES, type Service } from "@/lib/content";
+
+const EASING = [0.22, 1, 0.36, 1] as const;
+
+// Custom inline SVG icons per service
+const SERVICE_ICONS: Record<string, React.ReactNode> = {
+  "company-profile": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <path d="M8 21h8M12 17v4" />
+    </svg>
+  ),
+  "landing-page": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 17l10 5 10-5" />
+      <path d="M2 12l10 5 10-5" />
+    </svg>
+  ),
+  "web-app": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+    </svg>
+  ),
+  "business-system": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <rect x="5" y="2" width="14" height="20" rx="2" />
+      <path d="M9 7h6M9 11h6M9 15h4" />
+    </svg>
+  ),
+  "ui-ux": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <circle cx="13.5" cy="6.5" r="2.5" />
+      <circle cx="6.5" cy="15.5" r="2.5" />
+      <circle cx="17" cy="17" r="2" />
+      <path d="M13.5 9L6.5 13M13.5 9l3.5 5.5M6.5 18l3.5 1.5" />
+    </svg>
+  ),
+  "maintenance": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
+    </svg>
+  ),
+};
+
+function ServiceCard({ service, index }: { service: Service; index: number }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const shouldReduce = useReducedMotion();
+
+  // Alternate left/right entrance
+  const xDir = index % 2 === 0 ? -30 : 30;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={shouldReduce ? {} : { opacity: 0, x: xDir, y: 20 }}
+      animate={inView ? { opacity: 1, x: 0, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: 0.05 * (index % 3), ease: EASING }}
+      style={{
+        background: "#FFFFFF",
+        border: "1px solid #E5E7EB",
+        borderRadius: service.featured ? 20 : 16,
+        padding: service.featured ? "2.5rem" : "1.75rem",
+        gridColumn: service.featured ? "span 2" : "span 1",
+        position: "relative",
+        overflow: "hidden",
+        cursor: "default",
+        transition: "border-color 0.25s, box-shadow 0.25s, transform 0.25s",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "#90CAF9";
+        el.style.boxShadow = "0 8px 28px rgba(33,150,243,0.14)";
+        el.style.transform = "translateY(-4px)";
+        const bar = el.querySelector(".left-bar") as HTMLElement;
+        if (bar) bar.style.opacity = "1";
+        const icon = el.querySelector(".svc-icon") as HTMLElement;
+        if (icon) {
+          icon.style.background = "#2196F3";
+          icon.style.color = "white";
+          icon.style.transform = "rotate(-8deg) scale(1.05)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "#E5E7EB";
+        el.style.boxShadow = "none";
+        el.style.transform = "translateY(0)";
+        const bar = el.querySelector(".left-bar") as HTMLElement;
+        if (bar) bar.style.opacity = "0";
+        const icon = el.querySelector(".svc-icon") as HTMLElement;
+        if (icon) {
+          icon.style.background = service.featured ? "#E3F2FD" : "#F3F4F6";
+          icon.style.color = service.featured ? "#2196F3" : "#4B5563";
+          icon.style.transform = "none";
+        }
+      }}
+    >
+      {/* Animated left blue border */}
+      <div
+        className="left-bar"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 3,
+          background: "#2196F3",
+          borderRadius: "16px 0 0 16px",
+          opacity: 0,
+          transition: "opacity 0.2s",
+        }}
+      />
+
+      {/* Featured badge */}
+      {service.featured && (
+        <span
+          style={{
+            position: "absolute",
+            top: "1.5rem",
+            right: "1.5rem",
+            background: "#E8F5E9",
+            color: "#388E3C",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            padding: "3px 10px",
+            borderRadius: 20,
+          }}
+        >
+          ⭐ Paling Populer
+        </span>
+      )}
+
+      {/* Icon */}
+      <div
+        className="svc-icon"
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 14,
+          background: service.featured ? "#E3F2FD" : "#F3F4F6",
+          color: service.featured ? "#2196F3" : "#4B5563",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "1.25rem",
+          transition: "background 0.2s, color 0.2s, transform 0.2s",
+        }}
+      >
+        {SERVICE_ICONS[service.id]}
+      </div>
+
+      <h3
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: service.featured ? "1.35rem" : "1.05rem",
+          fontWeight: 700,
+          color: "#1E2328",
+          marginBottom: "0.625rem",
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {service.title}
+      </h3>
+      <p style={{ fontSize: "0.9rem", color: "#6B7280", lineHeight: 1.65 }}>{service.desc}</p>
+    </motion.div>
+  );
+}
+
+export default function ServicesSection() {
+  const headerRef = useRef(null);
+  const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const shouldReduce = useReducedMotion();
+
+  return (
+    <section
+      id="services"
+      style={{ background: "#F8FAFC", paddingTop: "5rem", paddingBottom: "5rem" }}
+    >
+      <div className="container">
+        {/* Header */}
+        <div style={{ marginBottom: "3.5rem" }}>
+          <motion.div
+            ref={headerRef}
+            initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: EASING }}
+          >
+            <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem" }}>
+              Layanan
+            </span>
+            <h2 className="display-2" style={{ color: "#1E2328", maxWidth: 520 }}>
+              Apa yang bisa<br />
+              kami <span style={{ color: "#2196F3" }}>bantu?</span>
+            </h2>
+          </motion.div>
+        </div>
+
+        {/* Asymmetric grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: "1.25rem",
+          }}
+          className="services-grid"
+        >
+          {SERVICES.map((service, i) => (
+            <ServiceCard key={service.id} service={service} index={i} />
+          ))}
+        </div>
+      </div>
+
+      <style>{`
+        @media (min-width: 768px) {
+          .services-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (min-width: 1024px) {
+          .services-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
