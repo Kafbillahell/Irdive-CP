@@ -5,6 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ABOUT } from "@/lib/content";
+import SectionBg from "@/components/ui/SectionBg";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 
@@ -43,8 +44,9 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
+      <SectionBg variant="dots-tl" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
       <div className="container">
 
         {/* Top: editorial label + tagline row */}

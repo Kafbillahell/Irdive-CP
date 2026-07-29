@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Bricolage_Grotesque } from 'next/font/google';
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import IrdiveMaskot from "@/components/logo-maskot/IrdiveMaskot";
+import SectionBg from "@/components/ui/SectionBg";
+import Image from "next/image";
 import { CONTACT_INFO } from "@/lib/content";
 
 const bricolage = Bricolage_Grotesque({ subsets: ["latin"], weight: ["700", "800"] });
@@ -62,8 +63,9 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
+      <SectionBg variant="dots-br" mascotSrc="/mascot-2.png" mascotOpacity={0.04} />
       <div className="container">
         {/* Header */}
         <motion.div
@@ -251,7 +253,9 @@ export default function ContactSection() {
           >
             {/* Mascot speech bubble */}
             <div style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
-              <IrdiveMaskot size="sm" />
+              <div style={{ width: 72, height: 72, position: "relative", flexShrink: 0 }}>
+                <Image src="/mascot-1.png" alt="IRDIVE mascot" fill style={{ objectFit: "contain" }} />
+              </div>
               <div
                 style={{
                   background: "#E3F2FD",

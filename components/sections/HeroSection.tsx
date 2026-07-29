@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
+import SectionBg from "@/components/ui/SectionBg";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 import Button from "@/components/ui/Button";
@@ -131,49 +132,7 @@ export default function HeroSection() {
         alignItems: "center",
       }}
     >
-      {/* Decorative dots — asymmetric, bottom-left */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: "8%",
-          left: "3%",
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 10px)",
-          gap: 10,
-          opacity: 0.35,
-          zIndex: 0,
-        }}
-      >
-        {Array.from({ length: 30 }).map((_, i) => (
-          <span
-            key={i}
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: "50%",
-              background: i % 5 === 0 ? "#4CAF50" : "#2196F3",
-              display: "block",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Top-right decorative ring */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: "15%",
-          right: "-60px",
-          width: 320,
-          height: 320,
-          borderRadius: "50%",
-          border: "40px solid #E3F2FD",
-          zIndex: 0,
-          opacity: 0.6,
-        }}
-      />
+      <SectionBg variant="full" mascotSrc="/mascot-2.png" mascotOpacity={0.05} />
 
       <div className="container" style={{ position: "relative", zIndex: 1, width: "100%" }}>
         <div
@@ -185,11 +144,11 @@ export default function HeroSection() {
           }}
           className="hero-grid"
         >
-          {/* Mascot — renders first (top) on mobile via order */}
+          {/* Mascot — mobile: top (order -1), desktop: right (order 2) */}
           <HeroParallaxMascot shouldReduceMotion={!!shouldReduceMotion} />
 
-          {/* Left: Text content */}
-          <div style={{ maxWidth: 640 }}>
+          {/* Text content — mobile: below mascot, desktop: left column (order 1) */}
+          <div className="hero-text-col" style={{ maxWidth: 640 }}>
             {/* Label tag */}
             <motion.div {...fadeUp(0)} style={{ marginBottom: "1.5rem" }}>
               <span className="label-tag">Studio Digital</span>
@@ -263,6 +222,10 @@ export default function HeroSection() {
           z-index: 1;
           display: flex;
           justify-content: center;
+          order: -1; /* mobile: above text */
+        }
+        .hero-text-col {
+          order: 1; /* mobile: below mascot */
         }
         .mascot-inner { width: 100%; }
         .hero-btn { font-size: 0.9rem !important; padding: 0.75rem 1.25rem !important; }
@@ -272,15 +235,20 @@ export default function HeroSection() {
         }
         @media (min-width: 960px) {
           .hero-section {
-            padding-top: calc(64px + 5rem);
+            padding-top: calc(64px + 4rem);
             padding-bottom: 5rem;
           }
           .hero-grid {
-            grid-template-columns: 55% 45% !important;
-            gap: 3rem !important;
+            grid-template-columns: 50% 50% !important;
+            gap: 2rem !important;
+            align-items: center;
+          }
+          /* Desktop: text LEFT (col 1), mascot RIGHT (col 2) */
+          .hero-text-col {
+            order: 1 !important;
           }
           .hero-mascot-col { 
-            order: 0;
+            order: 2 !important;
           }
         }
       `}</style>

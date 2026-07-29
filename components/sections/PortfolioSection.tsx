@@ -5,6 +5,7 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Syne } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { PORTFOLIO_ITEMS, type PortfolioItem } from "@/lib/content";
+import SectionBg from "@/components/ui/SectionBg";
 
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"] });
 
@@ -337,8 +338,9 @@ export default function PortfolioSection() {
   return (
     <section
       id="portfolio"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
+      <SectionBg variant="ring-left" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
       <div className="container">
         {/* Header */}
         <div

@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { SERVICES, type Service } from "@/lib/content";
+import SectionBg from "@/components/ui/SectionBg";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -236,8 +237,9 @@ export default function ServicesSection() {
   return (
     <section
       id="services"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
+      <SectionBg variant="ring-right" mascotSrc="/mascot-1.png" mascotOpacity={0.045} />
       <div className="container">
         {/* Header */}
         <div style={{ marginBottom: "3.5rem" }}>
