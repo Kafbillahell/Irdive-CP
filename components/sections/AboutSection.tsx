@@ -2,8 +2,11 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ABOUT } from "@/lib/content";
+
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -40,7 +43,7 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      style={{ background: "#FFFFFF", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
     >
       <div className="container">
 
@@ -57,12 +60,12 @@ export default function AboutSection() {
           {/* Left col */}
           <div>
             <RevealBlock delay={0}>
-              <span className="label-tag" style={{ display: "block", marginBottom: "1.25rem" }}>
+              <span className="label-tag" style={{ display: "block", marginBottom: "1.25rem", color: "var(--theme-accent)" }}>
                 Tentang IRDIVE
               </span>
-              <h2 className="display-2" style={{ color: "#1E2328", maxWidth: 480 }}>
+              <h2 className={spaceGrotesk.className} style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 480 }}>
                 Bukan sekadar<br />
-                <span style={{ color: "#2196F3" }}>vendor</span> —<br />
+                <span style={{ color: "var(--theme-accent)" }}>vendor</span> —<br />
                 mitra digital.
               </h2>
             </RevealBlock>
@@ -88,8 +91,9 @@ export default function AboutSection() {
         <RevealBlock delay={0.08} style={{ marginBottom: "4rem" }}>
           <p
             style={{
-              fontSize: "1.1rem",
-              color: "#4B5563",
+              fontSize: "1.15rem",
+              color: "var(--theme-text)",
+              opacity: 0.8,
               lineHeight: 1.8,
               maxWidth: 680,
             }}
@@ -112,8 +116,8 @@ export default function AboutSection() {
           <RevealBlock delay={0.1}>
             <div
               style={{
-                background: "#F8FBFF",
-                border: "1px solid #E3F2FD",
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid var(--theme-border)",
                 borderRadius: 16,
                 padding: "2rem",
                 height: "100%",
@@ -122,22 +126,23 @@ export default function AboutSection() {
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
                 <span
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: "#E3F2FD",
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid var(--theme-border)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "1.1rem",
+                    color: "var(--theme-accent)",
                     flexShrink: 0,
                   }}
                 >
-                  🔭
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 </span>
-                <span className="heading-2" style={{ color: "#1E2328" }}>Visi</span>
+                <span className={spaceGrotesk.className} style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--theme-text)" }}>Visi</span>
               </div>
-              <p style={{ color: "#4B5563", lineHeight: 1.7 }}>{ABOUT.vision}</p>
+              <p style={{ color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.7 }}>{ABOUT.vision}</p>
             </div>
           </RevealBlock>
 
@@ -145,8 +150,8 @@ export default function AboutSection() {
           <RevealBlock delay={0.18}>
             <div
               style={{
-                background: "#F6FBF6",
-                border: "1px solid #C8E6C9",
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid var(--theme-border)",
                 borderRadius: 16,
                 padding: "2rem",
                 height: "100%",
@@ -155,22 +160,23 @@ export default function AboutSection() {
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
                 <span
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: "#E8F5E9",
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid var(--theme-border)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "1.1rem",
+                    color: "var(--theme-accent)",
                     flexShrink: 0,
                   }}
                 >
-                  🎯
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 </span>
-                <span className="heading-2" style={{ color: "#1E2328" }}>Misi</span>
+                <span className={spaceGrotesk.className} style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--theme-text)" }}>Misi</span>
               </div>
-              <p style={{ color: "#4B5563", lineHeight: 1.7 }}>{ABOUT.mission}</p>
+              <p style={{ color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.7 }}>{ABOUT.mission}</p>
             </div>
           </RevealBlock>
         </div>
@@ -193,27 +199,27 @@ export default function AboutSection() {
                   alignItems: "flex-start",
                   padding: "1.5rem",
                   borderRadius: 14,
-                  border: "1px solid #F3F4F6",
-                  background: "#FAFAFA",
+                  border: "1px solid var(--theme-border)",
+                  background: "rgba(255,255,255,0.02)",
                   transition: "border-color 0.2s, box-shadow 0.2s, transform 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "#90CAF9";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(33,150,243,0.10)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--theme-accent)";
                   (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "#F3F4F6";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--theme-border)";
                   (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                 }}
               >
-                <span style={{ fontSize: "1.5rem", flexShrink: 0 }}>{val.icon}</span>
+                <span style={{ fontSize: "1.5rem", flexShrink: 0 }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </span>
                 <div>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.05rem", color: "#1E2328", marginBottom: "0.375rem" }}>
+                  <h3 className={spaceGrotesk.className} style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--theme-text)", marginBottom: "0.375rem" }}>
                     {val.title}
                   </h3>
-                  <p style={{ color: "#6B7280", fontSize: "0.95rem", lineHeight: 1.6 }}>{val.desc}</p>
+                  <p style={{ color: "var(--theme-text)", opacity: 0.7, fontSize: "0.95rem", lineHeight: 1.6 }}>{val.desc}</p>
                 </div>
               </div>
             </RevealBlock>

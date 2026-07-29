@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { SERVICES, type Service } from "@/lib/content";
 
@@ -50,11 +52,62 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
 };
 
 function ServiceCard({ service, index }: { service: Service; index: number }) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const shouldReduce = useReducedMotion();
 
-  // Alternate left/right entrance
+  useGSAP(() => {
+    if (shouldReduce) return;
+    const mm = gsap.matchMedia();
+    
+    mm.add("(hover: hover) and (pointer: fine)", () => {
+      const xTo = gsap.quickTo(glowRef.current, "x", { duration: 0.4, ease: "power3" });
+      const yTo = gsap.quickTo(glowRef.current, "y", { duration: 0.4, ease: "power3" });
+
+      const handleMove = (e: MouseEvent) => {
+        const rect = ref.current?.getBoundingClientRect();
+        if(!rect) return;
+        xTo(e.clientX - rect.left);
+        yTo(e.clientY - rect.top);
+      };
+
+      const handleEnter = () => gsap.to(glowRef.current, { opacity: 1, duration: 0.3 });
+      const handleLeave = () => gsap.to(glowRef.current, { opacity: 0, duration: 0.3 });
+
+      ref.current?.addEventListener("mousemove", handleMove);
+      ref.current?.addEventListener("mouseenter", handleEnter);
+      ref.current?.addEventListener("mouseleave", handleLeave);
+      
+      return () => {
+        ref.current?.removeEventListener("mousemove", handleMove);
+        ref.current?.removeEventListener("mouseenter", handleEnter);
+        ref.current?.removeEventListener("mouseleave", handleLeave);
+      }
+    });
+
+    // Mobile fallback: Shimmer pulse via ScrollTrigger
+    mm.add("(hover: none)", () => {
+      // Glow stays at center pulsing
+      gsap.set(glowRef.current, { x: "50%", y: "50%", xPercent: -50, yPercent: -50, opacity: 0 });
+      gsap.to(glowRef.current, {
+        opacity: 0.6,
+        scale: 1.2,
+        duration: 2,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+        scrollTrigger: {
+          trigger: ref.current,
+          start: "top center",
+          end: "bottom center",
+          toggleActions: "play pause resume pause",
+        }
+      });
+    });
+
+  }, { scope: ref, dependencies: [shouldReduce] });
+
   const xDir = index % 2 === 0 ? -30 : 30;
 
   return (
@@ -64,8 +117,8 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       animate={inView ? { opacity: 1, x: 0, y: 0 } : {}}
       transition={{ duration: 0.6, delay: 0.05 * (index % 3), ease: EASING }}
       style={{
-        background: "#FFFFFF",
-        border: "1px solid #E5E7EB",
+        background: "transparent",
+        border: "1px solid var(--theme-border)",
         borderRadius: service.featured ? 20 : 16,
         padding: service.featured ? "2.5rem" : "1.75rem",
         gridColumn: service.featured ? "span 2" : "span 1",
@@ -74,35 +127,31 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         cursor: "default",
         transition: "border-color 0.25s, box-shadow 0.25s, transform 0.25s",
       }}
-      onMouseEnter={(e) => {
+      onMouseEnter={(e: React.MouseEvent) => {
         const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "#90CAF9";
-        el.style.boxShadow = "0 8px 28px rgba(33,150,243,0.14)";
+        el.style.borderColor = "var(--theme-accent)";
         el.style.transform = "translateY(-4px)";
-        const bar = el.querySelector(".left-bar") as HTMLElement;
-        if (bar) bar.style.opacity = "1";
-        const icon = el.querySelector(".svc-icon") as HTMLElement;
-        if (icon) {
-          icon.style.background = "#2196F3";
-          icon.style.color = "white";
-          icon.style.transform = "rotate(-8deg) scale(1.05)";
-        }
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={(e: React.MouseEvent) => {
         const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "#E5E7EB";
-        el.style.boxShadow = "none";
+        el.style.borderColor = "var(--theme-border)";
         el.style.transform = "translateY(0)";
-        const bar = el.querySelector(".left-bar") as HTMLElement;
-        if (bar) bar.style.opacity = "0";
-        const icon = el.querySelector(".svc-icon") as HTMLElement;
-        if (icon) {
-          icon.style.background = service.featured ? "#E3F2FD" : "#F3F4F6";
-          icon.style.color = service.featured ? "#2196F3" : "#4B5563";
-          icon.style.transform = "none";
-        }
       }}
     >
+      {/* Magnetic Glow Tracker */}
+      <div 
+        ref={glowRef}
+        style={{
+          position: "absolute",
+          top: 0, left: 0,
+          width: 300, height: 300,
+          background: "radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 60%)",
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+          opacity: 0,
+          zIndex: 0
+        }}
+      />
       {/* Animated left blue border */}
       <div
         className="left-bar"
@@ -126,17 +175,19 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
             position: "absolute",
             top: "1.5rem",
             right: "1.5rem",
-            background: "#E8F5E9",
-            color: "#388E3C",
+            background: "rgba(255,255,255,0.1)",
+            color: "var(--theme-text)",
+            border: "1px solid var(--theme-border)",
             fontSize: "0.7rem",
             fontWeight: 700,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             padding: "3px 10px",
             borderRadius: 20,
+            zIndex: 1
           }}
         >
-          ⭐ Paling Populer
+          Paling Populer
         </span>
       )}
 
@@ -147,13 +198,15 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
           width: 52,
           height: 52,
           borderRadius: 14,
-          background: service.featured ? "#E3F2FD" : "#F3F4F6",
-          color: service.featured ? "#2196F3" : "#4B5563",
+          background: "rgba(255,255,255,0.05)",
+          color: "var(--theme-text)",
+          border: "1px solid var(--theme-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: "1.25rem",
           transition: "background 0.2s, color 0.2s, transform 0.2s",
+          position: "relative", zIndex: 1
         }}
       >
         {SERVICE_ICONS[service.id]}
@@ -164,14 +217,15 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
           fontFamily: "var(--font-display)",
           fontSize: service.featured ? "1.35rem" : "1.05rem",
           fontWeight: 700,
-          color: "#1E2328",
+          color: "var(--theme-text)",
           marginBottom: "0.625rem",
           letterSpacing: "-0.02em",
+          position: "relative", zIndex: 1
         }}
       >
         {service.title}
       </h3>
-      <p style={{ fontSize: "0.9rem", color: "#6B7280", lineHeight: 1.65 }}>{service.desc}</p>
+      <p style={{ fontSize: "0.9rem", color: "var(--theme-text)", opacity: 0.7, lineHeight: 1.65, position: "relative", zIndex: 1 }}>{service.desc}</p>
     </motion.div>
   );
 }
@@ -184,7 +238,7 @@ export default function ServicesSection() {
   return (
     <section
       id="services"
-      style={{ background: "#F8FAFC", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
     >
       <div className="container">
         {/* Header */}
@@ -195,12 +249,12 @@ export default function ServicesSection() {
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: EASING }}
           >
-            <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem" }}>
+            <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
               Layanan
             </span>
-            <h2 className="display-2" style={{ color: "#1E2328", maxWidth: 520 }}>
+            <h2 className="display-2" style={{ color: "var(--theme-text)", maxWidth: 520 }}>
               Apa yang bisa<br />
-              kami <span style={{ color: "#2196F3" }}>bantu?</span>
+              kami <span style={{ color: "var(--theme-accent)" }}>bantu?</span>
             </h2>
           </motion.div>
         </div>

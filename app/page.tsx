@@ -1,12 +1,15 @@
+import dynamic from "next/dynamic";
 import Navbar from "@/components/ui/Navbar";
 import SectionProgressIndicator from "@/components/ui/SectionProgressIndicator";
-import SectionDivider from "@/components/ui/SectionDivider";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
-import ServicesSection from "@/components/sections/ServicesSection";
-import PortfolioSection from "@/components/sections/PortfolioSection";
-import ContactSection from "@/components/sections/ContactSection";
-import PartnershipsSection from "@/components/sections/PartnershipsSection";
+import ThemeZone from "@/components/theme/ThemeZone";
+
+// Lazy load sections that exist beneath the fold
+const ServicesSection = dynamic(() => import("@/components/sections/ServicesSection"));
+const PortfolioSection = dynamic(() => import("@/components/sections/PortfolioSection"));
+const ContactSection = dynamic(() => import("@/components/sections/ContactSection"));
+const PartnershipsSection = dynamic(() => import("@/components/sections/PartnershipsSection"));
 
 export default function Home() {
   return (
@@ -15,46 +18,37 @@ export default function Home() {
       <SectionProgressIndicator />
 
       <main>
-        {/* 1. Hero */}
-        <HeroSection />
+        {/* Zona 1: Terang - Jati Diri */}
+        <ThemeZone bg="#FAFAFA" text="#0B0F19" accent="#254EDB" border="#E5E7EB">
+          <HeroSection />
+          {/* Divider can be replaced or stripped since sections melt together now */}
+          <AboutSection />
+        </ThemeZone>
 
-        {/* Hero → About (off-white → white) */}
-        <SectionDivider fromColor="#FAFAFA" toColor="#FFFFFF" />
+        {/* Zona 2: Gelap - Kedalaman Bisnis */}
+        <ThemeZone bg="#0B0F19" text="#F9FAFB" accent="#048753" border="#1F2937">
+          <ServicesSection />
+        </ThemeZone>
 
-        {/* 2. About */}
-        <AboutSection />
+        {/* Zona 3: Industrial - Galeri */}
+        <ThemeZone bg="#F4F5F7" text="#111827" accent="#254EDB" border="#E5E7EB">
+          <PortfolioSection />
+        </ThemeZone>
 
-        {/* About → Services (white → #F8FAFC) */}
-        <SectionDivider fromColor="#FFFFFF" toColor="#F8FAFC" flip />
-
-        {/* 3. Services */}
-        <ServicesSection />
-
-        {/* Services → Portfolio (F8FAFC → white) */}
-        <SectionDivider fromColor="#F8FAFC" toColor="#FFFFFF" />
-
-        {/* 4. Portfolio */}
-        <PortfolioSection />
-
-        {/* Portfolio → Contact (white → #F8FAFC) */}
-        <SectionDivider fromColor="#FFFFFF" toColor="#F8FAFC" flip />
-
-        {/* 5. Contact */}
-        <ContactSection />
-
-        {/* Contact → Partnerships (F8FAFC → white) */}
-        <SectionDivider fromColor="#F8FAFC" toColor="#FFFFFF" />
-
-        {/* 6. Partnerships */}
-        <PartnershipsSection />
+        {/* Zona 4: Gelap Final - Resolusi */}
+        <ThemeZone bg="#080B13" text="#F9FAFB" accent="#048753" border="#1F2937">
+          <ContactSection />
+          <PartnershipsSection />
+        </ThemeZone>
       </main>
 
       {/* Footer */}
       <footer
         style={{
-          borderTop: "1px solid #E5E7EB",
+          borderTop: "1px solid var(--theme-border)",
           padding: "2rem 0",
-          background: "#FAFAFA",
+          background: "var(--theme-bg)",
+          color: "var(--theme-text)"
         }}
       >
         <div

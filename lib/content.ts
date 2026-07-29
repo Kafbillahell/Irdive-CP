@@ -196,20 +196,20 @@ export const CONTACT_INFO = {
 // ── Partnerships ──────────────────────────────────────────────
 export interface TechBadge {
   name: string;
-  emoji: string;
+  color: string;
 }
 
 export const TECH_STACK: TechBadge[] = [
-  { name: "Next.js", emoji: "▲" },
-  { name: "React", emoji: "⚛" },
-  { name: "TypeScript", emoji: "🔷" },
-  { name: "Tailwind CSS", emoji: "🎨" },
-  { name: "Node.js", emoji: "🟢" },
-  { name: "PostgreSQL", emoji: "🐘" },
-  { name: "Vercel", emoji: "▲" },
-  { name: "Supabase", emoji: "⚡" },
-  { name: "Figma", emoji: "🖼" },
-  { name: "Framer", emoji: "🎞" },
-  { name: "Sanity", emoji: "📝" },
-  { name: "Stripe", emoji: "💳" },
+  { name: "Next.js", color: "#000000" },
+  { name: "React", color: "#61DAFB" },
+  { name: "TypeScript", color: "#3178C6" },
+  { name: "Tailwind CSS", color: "#38B2AC" },
+  { name: "Node.js", color: "#339933" },
+  { name: "PostgreSQL", color: "#336791" },
+  { name: "Vercel", color: "#000000" },
+  { name: "Supabase", color: "#3ECF8E" },
+  { name: "Figma", color: "#F24E1E" },
+  { name: "Framer", color: "#0055FF" },
+  { name: "Sanity", color: "#F03E2F" },
+  { name: "Stripe", color: "#008CDD" },
 ];

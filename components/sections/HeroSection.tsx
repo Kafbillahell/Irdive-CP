@@ -2,8 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import IrdiveMaskot from "@/components/logo-maskot/IrdiveMaskot";
+
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 import Button from "@/components/ui/Button";
 import { HERO, STATS } from "@/lib/content";
 
@@ -42,11 +47,75 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
 
   return (
     <div ref={ref} style={{ textAlign: "left" }}>
-      <div style={{ fontFamily: "var(--font-display)", fontSize: "2rem", fontWeight: 800, color: "#1E2328", lineHeight: 1, letterSpacing: "-0.04em" }}>
+      <div className={spaceGrotesk.className} style={{ fontSize: "2rem", fontWeight: 700, color: "var(--theme-text)", lineHeight: 1, letterSpacing: "-0.04em" }}>
         {count}{suffix}
       </div>
-      <div style={{ fontSize: "0.8rem", color: "#6B7280", marginTop: 4, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: "0.8rem", color: "var(--theme-text)", opacity: 0.6, marginTop: 4, fontWeight: 500 }}>{label}</div>
     </div>
+  );
+}
+
+function HeroParallaxMascot({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
+  const container = useRef<HTMLDivElement>(null);
+  const mascotInner = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (shouldReduceMotion) return;
+    const mm = gsap.matchMedia();
+    mm.add("(hover: hover) and (pointer: fine)", () => {
+      const xTo = gsap.quickTo(mascotInner.current, "x", { duration: 0.6, ease: "power3.out" });
+      const yTo = gsap.quickTo(mascotInner.current, "y", { duration: 0.6, ease: "power3.out" });
+
+      const handleMove = (e: MouseEvent) => {
+        const rect = container.current?.getBoundingClientRect();
+        if(!rect) return;
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = (e.clientX - centerX) / window.innerWidth;
+        const dy = (e.clientY - centerY) / window.innerHeight;
+        xTo(dx * 45); 
+        yTo(dy * 45);
+      };
+      
+      window.addEventListener("mousemove", handleMove);
+      return () => window.removeEventListener("mousemove", handleMove);
+    });
+
+    mm.add("(hover: none)", () => {
+       const handleOrientation = (e: DeviceOrientationEvent) => {
+          if(e.gamma === null || e.beta === null) return;
+          const x = (e.gamma / 90) * 15; 
+          const y = (e.beta / 180) * 15;
+          gsap.to(mascotInner.current, { x, y, duration: 0.4, ease: "power2.out" });
+       }
+       window.addEventListener("deviceorientation", handleOrientation);
+       return () => window.removeEventListener("deviceorientation", handleOrientation);
+    });
+  }, { scope: container, dependencies: [shouldReduceMotion] });
+
+  return (
+    <motion.div
+      ref={container}
+      initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.9, delay: 0, ease: [0.22, 1, 0.36, 1] }}
+      style={{ display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          width: 280,
+          height: 280,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, var(--theme-border) 0%, transparent 70%)",
+          zIndex: 0,
+        }}
+      />
+      <div ref={mascotInner} style={{ position: "relative", zIndex: 1 }}>
+        <IrdiveMaskot size="xl" preload />
+      </div>
+    </motion.div>
   );
 }
 
@@ -65,7 +134,8 @@ export default function HeroSection() {
     <section
       id="home"
       style={{
-        background: "var(--off-white)",
+        background: "transparent",
+        color: "var(--theme-text)",
         paddingTop: "calc(64px + 5rem)",
         paddingBottom: "4rem",
         overflow: "hidden",
@@ -142,8 +212,8 @@ export default function HeroSection() {
                 <motion.span
                   key={i}
                   {...fadeUp(0.15 + i * 0.08)}
-                  className="display-1"
-                  style={{ display: "block", color: i === 1 ? "#2196F3" : "#1E2328" }}
+                  className={spaceGrotesk.className}
+                  style={{ display: "block", fontSize: "clamp(2.75rem, 6vw, 5rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
                 >
                   {line}
                 </motion.span>
@@ -153,7 +223,7 @@ export default function HeroSection() {
             {/* Subheadline */}
             <motion.p
               {...fadeUp(0.3)}
-              style={{ fontSize: "1.125rem", color: "#4B5563", lineHeight: 1.7, marginBottom: "2.5rem", maxWidth: 520 }}
+              style={{ fontSize: "1.125rem", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.7, marginBottom: "2.5rem", maxWidth: 520 }}
             >
               {HERO.subheadline}
             </motion.p>
@@ -185,34 +255,7 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Right: Mascot */}
-          <motion.div
-            initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0, ease: EASING }}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "relative",
-            }}
-          >
-            {/* Glow behind mascot */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                width: 280,
-                height: 280,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, #E3F2FD 0%, transparent 70%)",
-                zIndex: 0,
-              }}
-            />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <IrdiveMaskot size="xl" preload />
-            </div>
-          </motion.div>
+          <HeroParallaxMascot shouldReduceMotion={shouldReduceMotion} />
         </div>
       </div>
 

@@ -15,8 +15,14 @@
   --blue-light: #E3F2FD;
   --blue-mid: #90CAF9;
   --green: #4CAF50;
-  --green-dark: #388E3C;
+  --green-dark: #03663C;
   --green-light: #E8F5E9;
+
+  /* Scroll Theme Zones */
+  --theme-bg: #FAFAFA;
+  --theme-text: #0B0F19;
+  --theme-accent: #254EDB;
+  --theme-border: #E5E7EB;
 
   /* Neutrals */
   --off-white: #FAFAFA;
@@ -82,8 +88,8 @@ html {
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.6;

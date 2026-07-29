@@ -2,8 +2,11 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { Syne } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { PORTFOLIO_ITEMS, type PortfolioItem } from "@/lib/content";
+
+const syne = Syne({ subsets: ["latin"], weight: ["700", "800"] });
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -20,17 +23,18 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
     <>
       <motion.article
         ref={ref}
-        initial={shouldReduce ? {} : { opacity: 0, scale: 0.94, y: 24 }}
-        animate={inView ? { opacity: 1, scale: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.07 * (index % 3), ease: EASING }}
+        initial={shouldReduce ? {} : { clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", scale: 1.05 }}
+        whileInView={shouldReduce ? {} : { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", scale: 1 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.85, delay: 0.08 * (index % 3), ease: EASING }}
         style={{
           gridColumn: isWide ? "span 2" : "span 1",
           borderRadius: 18,
           overflow: "hidden",
           cursor: "pointer",
           position: "relative",
-          border: "1px solid #E5E7EB",
-          background: "#FFFFFF",
+          border: "1px solid var(--theme-border)",
+          background: "transparent",
           minHeight: isWide ? 260 : 220,
         }}
         onMouseEnter={() => setHovered(true)}
@@ -39,7 +43,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
         aria-label={`View project: ${item.title}`}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && setModalOpen(true)}
+        onKeyDown={(e: React.KeyboardEvent) => e.key === "Enter" && setModalOpen(true)}
       >
         {/* Color block top */}
         <div
@@ -64,13 +68,13 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
             }}
           />
           <span
+            className={syne.className}
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "2.5rem",
+              fontSize: "2.8rem",
               fontWeight: 800,
               color: item.accentColor,
               opacity: 0.15,
-              letterSpacing: "-0.05em",
+              letterSpacing: "-0.04em",
               position: "relative",
               zIndex: 1,
               userSelect: "none",
@@ -141,11 +145,11 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
         {/* Card body */}
         <div style={{ padding: "1.25rem 1.5rem" }}>
           <h3
+            className={syne.className}
             style={{
-              fontFamily: "var(--font-display)",
               fontWeight: 700,
-              fontSize: "1rem",
-              color: "#1E2328",
+              fontSize: "1.1rem",
+              color: "var(--theme-text)",
               marginBottom: "0.25rem",
             }}
           >
@@ -204,7 +208,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
                 overflow: "hidden",
                 boxShadow: "0 24px 64px rgba(30,35,40,0.22)",
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               {/* Modal header */}
               <div
@@ -332,7 +336,7 @@ export default function PortfolioSection() {
   return (
     <section
       id="portfolio"
-      style={{ background: "#FFFFFF", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
     >
       <div className="container">
         {/* Header */}
@@ -352,12 +356,12 @@ export default function PortfolioSection() {
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: EASING }}
           >
-            <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem" }}>
+            <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
               Portfolio
             </span>
-            <h2 className="display-2" style={{ color: "#1E2328" }}>
+            <h2 className={syne.className} style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "var(--theme-text)" }}>
               Karya yang<br />
-              kami <span style={{ color: "#2196F3" }}>banggakan.</span>
+              kami <span style={{ color: "var(--theme-accent)" }}>banggakan.</span>
             </h2>
           </motion.div>
 
