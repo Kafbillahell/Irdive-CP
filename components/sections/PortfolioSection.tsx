@@ -235,9 +235,12 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
 export default function PortfolioSection() {
   const headerRef     = useRef(null);
   const sliderRef     = useRef<HTMLDivElement>(null);
+  const sectionRef    = useRef<HTMLElement | null>(null);
   const headerInView  = useInView(headerRef, { once: true, margin: "-80px" });
   const shouldReduce  = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const smoothCenter = useRef<number | null>(null);
 
   const carouselItems = [
     { ...PORTFOLIO_ITEMS[PORTFOLIO_ITEMS.length - 1], clone: true, realIndex: PORTFOLIO_ITEMS.length - 1 },
@@ -251,10 +254,59 @@ export default function PortfolioSection() {
     target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   };
 
+  // Smooth animation loop (requestAnimationFrame) to avoid jitter from scroll events
+  useEffect(() => {
+    if (shouldReduce || !sliderRef.current) return;
+    const slider = sliderRef.current;
+    const run = () => {
+      const sliderRect = slider.getBoundingClientRect();
+      const targetCenter = slider.scrollLeft + sliderRect.width / 2;
+
+      if (smoothCenter.current == null) smoothCenter.current = targetCenter;
+      // lerp towards target for smooth easing
+      smoothCenter.current = smoothCenter.current + (targetCenter - smoothCenter.current) * 0.12;
+      const center = smoothCenter.current;
+
+      const allCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper'));
+
+      allCards.forEach((card) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        const norm = Math.max(-1, Math.min(1, (cardCenter - center) / (sliderRect.width / 2)));
+        const absNorm = Math.abs(norm);
+
+        const rotateY = -norm * 24;
+        const rotateX = Math.min(6, absNorm * 5);
+        const translateZ = 140 * absNorm;
+        const scale = 0.92 + absNorm * 0.12;
+
+        // apply transforms directly without per-scroll heavy layout reads
+        card.style.transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
+        card.style.transformStyle = 'preserve-3d';
+        card.style.zIndex = String(Math.round(absNorm * 200) + 1);
+      });
+
+      rafRef.current = requestAnimationFrame(run);
+    };
+
+    rafRef.current = requestAnimationFrame(run);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    };
+  }, [shouldReduce]);
+
   useEffect(() => {
     if (shouldReduce || PORTFOLIO_ITEMS.length <= 1) return;
     scrollToIndex(activeIndex);
   }, [activeIndex, shouldReduce]);
+
+  // Update accent color smoothly when active index changes
+  useEffect(() => {
+    const color = PORTFOLIO_ITEMS[activeIndex]?.accentColor ?? "var(--theme-accent)";
+    if (sectionRef.current) {
+      sectionRef.current.style.setProperty('--portfolio-accent', color);
+    }
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!sliderRef.current || PORTFOLIO_ITEMS.length <= 1) return;
@@ -273,7 +325,8 @@ export default function PortfolioSection() {
   return (
     <section
       id="portfolio"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
+      ref={sectionRef as any}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden", ["--portfolio-accent" as any]: "var(--theme-accent)" }}
     >
       <SectionBg variant="mascot-right" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
 
@@ -331,51 +384,9 @@ export default function PortfolioSection() {
                 perspectiveOrigin: "50% 50%",
               }}
               onScroll={() => {
-                if (!sliderRef.current) return;
-                const slider = sliderRef.current;
-                const sliderRect = slider.getBoundingClientRect();
-                const center = slider.scrollLeft + sliderRect.width / 2;
-
-                // cards that are real (have data-idx) used to determine active index
-                const realCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]'));
-                const allCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper'));
-
-                let closest = activeIndex;
-                let closestDistance = Infinity;
-
-                // Compute transforms for all cards (including clones) to create curved room effect
-                allCards.forEach((card) => {
-                  const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-                  const norm = Math.max(-1, Math.min(1, (cardCenter - center) / (sliderRect.width / 2)));
-                  const absNorm = Math.abs(norm);
-
-                  // stronger curvature: sides move forward and tilt inward, center slightly recessed and smaller
-                  const rotateY = -norm * 24; // stronger inward tilt
-                  const rotateX = Math.min(6, absNorm * 5);
-                  const translateZ = 140 * absNorm; // sides come strongly forward
-                  const scale = 0.92 + absNorm * 0.12; // center smaller (≈0.92), sides larger
-
-                  const transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
-                  const wrapperStyle = card.style as CSSStyleDeclaration & { transform?: string };
-                  wrapperStyle.transform = transform;
-                  wrapperStyle.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
-                  wrapperStyle.transformStyle = 'preserve-3d';
-                  // zIndex: sides overlay center
-                  (card.style as any).zIndex = Math.round(absNorm * 200) + 1;
-                });
-
-                // Determine closest real card for active index
-                realCards.forEach((card) => {
-                  const idx = Number(card.dataset.idx);
-                  const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-                  const distance = Math.abs(cardCenter - center);
-                  if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closest = idx;
-                  }
-                });
-
-                if (closest !== activeIndex) setActiveIndex(closest);
+                // onScroll: just update position; smoothing handled in rAF loop
+                // keep this handler lightweight to avoid jank
+                return;
               }}
             >
               {carouselItems.map((item, i) => {
@@ -430,7 +441,7 @@ export default function PortfolioSection() {
                       height: isActive ? 14 : 12,
                       width: isActive ? 14 : 12,
                       borderRadius: "50%",
-                      background: isActive ? "var(--theme-accent)" : "rgba(0,0,0,0.06)",
+                      background: isActive ? "var(--portfolio-accent, var(--theme-accent))" : "rgba(0,0,0,0.06)",
                       backdropFilter: "blur(4px)",
                       boxShadow: isActive
                         ? "0 6px 12px rgba(33, 150, 243, 0.25), inset 0 -2px 6px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,0.7)"
