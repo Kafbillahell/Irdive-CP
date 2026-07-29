@@ -40,39 +40,10 @@ const PORTFOLIO_ICONS: Record<string, React.ReactNode> = {
 
 function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) {
   const ref  = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const shouldReduce = useReducedMotion();
 
   const bgImage = item.imageSrc ?? "/assets/image.png";
-
-  useGSAP(() => {
-    if (shouldReduce) return;
-    const mm = gsap.matchMedia();
-
-    mm.add("(hover: hover) and (pointer: fine)", () => {
-      const xTo = gsap.quickTo(glowRef.current, "x", { duration: 0.4, ease: "power3" });
-      const yTo = gsap.quickTo(glowRef.current, "y", { duration: 0.4, ease: "power3" });
-
-      const handleMove = (e: MouseEvent) => {
-        const rect = ref.current?.getBoundingClientRect();
-        if (!rect) return;
-        xTo(e.clientX - rect.left);
-        yTo(e.clientY - rect.top);
-      };
-      const handleEnter = () => gsap.to(glowRef.current, { opacity: 1, duration: 0.3 });
-      const handleLeave = () => gsap.to(glowRef.current, { opacity: 0, duration: 0.3 });
-
-      ref.current?.addEventListener("mousemove",  handleMove);
-      ref.current?.addEventListener("mouseenter", handleEnter);
-      ref.current?.addEventListener("mouseleave", handleLeave);
-      return () => {
-        ref.current?.removeEventListener("mousemove",  handleMove);
-        ref.current?.removeEventListener("mouseenter", handleEnter);
-        ref.current?.removeEventListener("mouseleave", handleLeave);
-      };
-    });
-  }, { scope: ref });
 
   return (
     <motion.div
@@ -92,21 +63,23 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
         border: "1px solid rgba(255,255,255,0.1)",
         background: "#0A0A0A", // Base dark before image
         boxShadow: "0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)", // Elegant deeper 3D lighting for dark cards
-        cursor: "grab",
-        transition: "border-color 0.4s, transform 0.4s",
-        transformStyle: "preserve-3d",
+        cursor: "default",
+        transition: "none",
+        transformStyle: "flat",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end", // content pushed to bottom over the image gradient
+        userSelect: "none",
+        WebkitTapHighlightColor: "transparent",
+        touchAction: "pan-y",
+        pointerEvents: "auto",
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.3)";
+        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.1)";
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.1)";
       }}
-      onMouseDown={(e) => (e.currentTarget.style.cursor = "grabbing")}
-      onMouseUp={(e) => (e.currentTarget.style.cursor = "grab")}
     >
       {/* ── Background Image ── */}
       <div style={{
@@ -127,24 +100,6 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
         background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 60%, rgba(0,0,0,0.95) 100%)",
         zIndex: 0,
       }} />
-
-      {/* Mouse-follow glow */}
-      <div
-        ref={glowRef}
-        aria-hidden
-        style={{
-          position: "absolute",
-          width: 240,
-          height: 240,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)`,
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-          opacity: 0,
-          zIndex: 1,
-          mixBlendMode: "overlay",
-        }}
-      />
 
       {/* ── Card Content ── */}
       <div style={{ padding: "2rem", position: "relative", zIndex: 2, display: "flex", flexDirection: "column" }}>
@@ -240,14 +195,15 @@ export default function PortfolioSection() {
   const shouldReduce  = useReducedMotion();
   const initialIndex = Math.floor(PORTFOLIO_ITEMS.length / 2);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const [tapCount, setTapCount] = useState(0);
+  const tapLockRef = useRef<number | null>(null);
+  const lastTapTargetRef = useRef<number | null>(null);
+  const touchModeRef = useRef(false);
   const rafRef = useRef<number | null>(null);
-  const pointerDownPos = useRef<Record<number, { x: number; y: number }>>({});
   const smoothCenter = useRef<number | null>(null);
   const lastZIndexes = useRef<Map<HTMLElement, number>>(new Map());
   const candidateIndex = useRef<number | null>(null);
   const stableFrames = useRef<number>(0);
-  const sliderPointer = useRef<{ active: boolean; id?: number; startX?: number; startY?: number }>({ active: false });
-  const suppressAutoDetectUntil = useRef<number>(0);
 
   const carouselItems = [
     { ...PORTFOLIO_ITEMS[PORTFOLIO_ITEMS.length - 1], clone: true, realIndex: PORTFOLIO_ITEMS.length - 1 },
@@ -263,10 +219,56 @@ export default function PortfolioSection() {
     slider.scrollTo({ left, behavior: "smooth" });
   };
 
+  const resetTapState = () => {
+    if (tapLockRef.current) {
+      window.clearTimeout(tapLockRef.current);
+    }
+    setTapCount(0);
+    lastTapTargetRef.current = null;
+    tapLockRef.current = null;
+  };
+
+  const handleCardTap = (index: number) => {
+    if (touchModeRef.current) {
+      if (tapLockRef.current) {
+        window.clearTimeout(tapLockRef.current);
+      }
+
+      if (lastTapTargetRef.current !== index) {
+        lastTapTargetRef.current = index;
+        setTapCount(1);
+        tapLockRef.current = window.setTimeout(() => {
+          resetTapState();
+        }, 320);
+        return;
+      }
+
+      setTapCount(2);
+      resetTapState();
+      goToIndex(index);
+      return;
+    }
+
+    if (tapLockRef.current) {
+      window.clearTimeout(tapLockRef.current);
+    }
+
+    if (lastTapTargetRef.current !== index) {
+      lastTapTargetRef.current = index;
+      setTapCount(1);
+      tapLockRef.current = window.setTimeout(() => {
+        resetTapState();
+      }, 320);
+      return;
+    }
+
+    setTapCount(2);
+    resetTapState();
+    goToIndex(index);
+  };
+
   const goToIndex = (index: number) => {
     const slider = sliderRef.current;
-    // suppress auto detection while programmatic scroll settles
-    suppressAutoDetectUntil.current = Date.now() + 600;
     setActiveIndex(index);
     if (!slider) return;
     const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
@@ -322,11 +324,6 @@ export default function PortfolioSection() {
         }
       });
 
-      // auto-detect closest real card; require stability across frames to avoid flicker
-      if (Date.now() < suppressAutoDetectUntil.current) {
-        rafRef.current = requestAnimationFrame(run);
-        return;
-      }
       if (realCenters.length > 0) {
         let minIdx = 0;
         let minDist = Math.abs(realCenters[0] - center);
@@ -442,37 +439,17 @@ export default function PortfolioSection() {
                 padding: "2rem 5vw 4rem 5vw",
                 overflowX: "hidden",
                 scrollSnapType: "x mandatory",
-                WebkitOverflowScrolling: "touch",
                 perspective: 1400,
                 perspectiveOrigin: "50% 50%",
-                touchAction: "pan-y", // disable horizontal touch panning so only clicks change slides
+                overscrollBehaviorX: "contain",
               }}
               onScroll={() => {
-                // onScroll: just update position; smoothing handled in rAF loop
-                // keep this handler lightweight to avoid jank
                 return;
               }}
               onWheel={(e) => {
-                // prevent horizontal wheel/trackpad gestures from scrolling the carousel
                 if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
                   e.preventDefault();
                 }
-              }}
-              onPointerDown={(e) => {
-                sliderPointer.current.active = true;
-                sliderPointer.current.id = e.pointerId;
-                sliderPointer.current.startX = e.clientX;
-                sliderPointer.current.startY = e.clientY;
-                try { (e.target as Element).setPointerCapture?.(e.pointerId); } catch {}
-              }}
-              onPointerMove={(e) => {
-                if (!sliderPointer.current.active) return;
-                e.preventDefault();
-              }}
-              onPointerUp={(e) => {
-                if (!sliderPointer.current.active) return;
-                sliderPointer.current.active = false;
-                try { (e.target as Element).releasePointerCapture?.(e.pointerId); } catch {}
               }}
             >
               {carouselItems.map((item, i) => {
@@ -493,24 +470,18 @@ export default function PortfolioSection() {
                         goToIndex(item.realIndex);
                       }
                     }}
-                    onPointerDown={(e) => {
-                      if (isClone) return;
-                      pointerDownPos.current[item.realIndex] = { x: e.clientX, y: e.clientY };
+                    onTouchStart={() => {
+                      touchModeRef.current = true;
                     }}
-                    onPointerUp={(e) => {
+                    onClick={(e) => {
                       if (isClone) return;
-                      const start = pointerDownPos.current[item.realIndex];
-                      delete pointerDownPos.current[item.realIndex];
-                      if (!start) {
-                        goToIndex(item.realIndex);
+                      if (touchModeRef.current) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleCardTap(item.realIndex);
                         return;
                       }
-                      const dx = Math.abs(e.clientX - start.x);
-                      const dy = Math.abs(e.clientY - start.y);
-                      // treat as click only when pointer movement is minimal
-                      if (dx < 8 && dy < 8) {
-                        goToIndex(item.realIndex);
-                      }
+                      handleCardTap(item.realIndex);
                     }}
                     style={{
                       flexShrink: 0,
@@ -522,6 +493,7 @@ export default function PortfolioSection() {
                       cursor: isClone ? "default" : "pointer",
                       willChange: 'transform',
                       pointerEvents: isClone ? 'none' : 'auto',
+                      userSelect: 'none',
                       // soften edges for clone fillers so they read as background
                       boxShadow: isClone ? 'inset 0 -10px 40px rgba(0,0,0,0.45)' : undefined,
                     }}
