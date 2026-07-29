@@ -75,7 +75,7 @@ export default function ContactSection() {
           <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
             Hubungi Kami
           </span>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 520 }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 520, lineHeight: 1.05 }}>
             Mari kita mulai<br />
             <span style={{ color: "var(--theme-accent)" }}>project</span> kamu.
           </h2>
@@ -93,6 +93,7 @@ export default function ContactSection() {
         >
           {/* LEFT: Form (60%) */}
           <motion.div
+            className="contact-left-card"
             initial={shouldReduce ? {} : { opacity: 0, x: -30 }}
             animate={headerInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.1, ease: EASING }}
@@ -116,51 +117,60 @@ export default function ContactSection() {
                 </p>
               </div>
             ) : (
-              <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: "2rem", background: "#FFFFFF", borderRadius: 16, border: "1px solid #E5E7EB", textAlign: "center", alignItems: "center", overflow: "hidden", minHeight: 380, justifyContent: "center" }}>
-                {/* Background Image Layer */}
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-                  <Image src="/bg-ig.png" alt="IRDIVE Contact Background" fill style={{ objectFit: "cover", objectPosition: "center" }} />
-                  {/* Overlay for readable text */}
-                  <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.15)" }} />
-                </div>
-
-                {/* Content Box with Glassmorphism */}
-                <div style={{ position: "relative", zIndex: 1, padding: "2rem", margin: "1.5rem", background: "rgba(255, 255, 255, 0.6)", backdropFilter: "blur(12px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 8px 32px rgba(0,0,0,0.08)" }}>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, color: "#1E2328", marginBottom: "0.5rem" }}>
-                    Terhubung Lewat Instagram 
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: 340, gap: "1.5rem" }}>
+                <div style={{ width: "100%", maxWidth: 560, padding: "2rem 2.25rem", background: "radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 42%), #F6F8FF", borderRadius: "28px", border: "1px solid rgba(15, 23, 42, 0.08)", boxShadow: "0 28px 80px rgba(15, 23, 42, 0.08)" }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 900, color: "#0F172A", marginBottom: "1rem", lineHeight: 1.05 }}>
+                    Terhubung Lewat Instagram
                   </h3>
-                  <p style={{ color: "#4B5563", fontSize: "0.95rem", lineHeight: 1.6, maxWidth: 360, margin: "0 auto 1.5rem" }}>
+                  <p style={{ color: "#475569", fontSize: "1rem", lineHeight: 1.75, maxWidth: 500, margin: "0 0 1.75rem" }}>
                     Saat ini kami lebih sering dan aktif merespons pesan melalui Instagram DM. Mari diskusikan detail project-mu di sana!
                   </p>
-                  
                   <motion.a
-                  href="https://www.instagram.com/irdive.tech?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.04, y: -2, boxShadow: "0 8px 30px rgba(0,0,0,0.15)" }}
-                  whileTap={{ scale: 0.9, y: 1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  style={{
-                    background: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
-                    color: "white",
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 700,
-                    fontSize: "1.05rem",
-                    padding: "1rem 2.5rem",
-                    textDecoration: "none",
-                    borderRadius: 12,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "0.5rem",
-                    boxShadow: "0 4px 14px rgba(220, 39, 67, 0.3)",
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                  </svg>
-                  Kirim via Instagram
-                </motion.a>
+                    href="https://www.instagram.com/irdive.tech?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.02, y: -1, boxShadow: "0 10px 20px rgba(37, 99, 235, 0.14)" }}
+                    whileTap={{ scale: 0.98, y: 0 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 22 }}
+                    style={{
+                      background: "#2563EB",
+                      color: "white",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                      padding: "0.95rem 1.9rem",
+                      textDecoration: "none",
+                      borderRadius: 9999,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.6rem",
+                      boxShadow: "0 12px 24px rgba(37, 99, 235, 0.15)",
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                    Kirim via Instagram
+                  </motion.a>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.85rem", marginTop: "1.75rem" }}>
+                    <div style={{ padding: "1rem", borderRadius: 18, background: "rgba(37, 99, 235, 0.08)", border: "1px solid rgba(37, 99, 235, 0.12)", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <span style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 800, color: "#0F172A" }}>
+                        Respon cepat
+                      </span>
+                      <span style={{ fontSize: "0.92rem", color: "#475569", lineHeight: 1.4 }}>
+                        Balasan DM dalam 1x24 jam.
+                      </span>
+                    </div>
+                    <div style={{ padding: "1rem", borderRadius: 18, background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.12)", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <span style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 800, color: "#0F172A" }}>
+                        Solusi pas
+                      </span>
+                      <span style={{ fontSize: "0.92rem", color: "#475569", lineHeight: 1.4 }}>
+                        Kami bantu susun ide dan next step.
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -168,13 +178,14 @@ export default function ContactSection() {
 
           {/* RIGHT: Info + Mascot (40%) */}
           <motion.div
+            className="contact-right-col"
             initial={shouldReduce ? {} : { opacity: 0, x: 30 }}
             animate={headerInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2, ease: EASING }}
             style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
           >
             {/* Mascot speech bubble */}
-            <div style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
+            <div className="contact-speech" style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
               <div style={{ width: 72, height: 72, position: "relative", flexShrink: 0 }}>
                 <Image src="/mascot-1.png" alt="IRDIVE mascot" fill style={{ objectFit: "contain" }} />
               </div>
@@ -195,21 +206,21 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* ── Contact info (3D Dark Mode) ── */}
+            {/* ── Contact info (Minimal Dark) ── */}
             <div
+              className="contact-info-panel"
               style={{
-                background: "linear-gradient(145deg, rgba(35, 35, 35, 0.8), rgba(15, 15, 15, 0.95))",
-                backdropFilter: "blur(16px)",
+                background: "#0B1530",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
                 borderRadius: "24px",
                 padding: "2rem",
-                boxShadow: "0 24px 48px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.5)",
+                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.22)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "0.35rem", // JARAK ANTAR KOTAK DIPERkecil
+                gap: "1rem",
               }}
             >
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", fontWeight: 700, color: "rgba(255, 255, 255, 0.85)", marginBottom: "1rem", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.45rem", fontWeight: 900, color: "#F8FAFF", marginBottom: "1rem", letterSpacing: "-0.02em" }}>
                 Cara lain menghubungi kami
               </h3>
 
@@ -223,19 +234,20 @@ export default function ContactSection() {
                 const Wrapper = isLink ? "a" : "div";
                 return (
                   <Wrapper
+                    className="contact-info-item"
                     key={item.label}
                     href={item.href || undefined}
                     target={isLink ? "_blank" : undefined}
                     rel={isLink ? "noopener noreferrer" : undefined}
                     style={{
                       display: "flex", alignItems: "center", gap: "1rem", textDecoration: "none",
-                      padding: "0.6rem 1rem", // PADDING ATAS BAWAH DIPERKECIL agar kotak lebih ramping
+                      padding: "1rem 1.2rem",
                       borderRadius: "16px",
-                      background: "rgba(255, 255, 255, 0.03)",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.4)",
-                      backdropFilter: "blur(12px)",
-                      transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      boxShadow: "0 8px 20px rgba(0, 0, 0, 0.08)",
+                      backdropFilter: "blur(8px)",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
                       cursor: isLink ? "pointer" : "default"
                     }}
                     onMouseEnter={isLink ? (e) => {
@@ -268,13 +280,13 @@ export default function ContactSection() {
                     {/* Label & Value */}
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem", overflow: "hidden" }}>
                       <span style={{ 
-                        fontSize: "0.65rem", fontWeight: 700, color: "rgba(255, 255, 255, 0.45)", 
-                        textTransform: "uppercase", letterSpacing: "0.08em" 
+                        fontSize: "0.75rem", fontWeight: 700, color: "rgba(248, 250, 255, 0.72)", 
+                        textTransform: "uppercase", letterSpacing: "0.12em" 
                       }}>
                         {item.label}
                       </span>
                       <span style={{ 
-                        fontSize: "0.9rem", fontWeight: 500, color: isLink ? "#60A5FA" : "rgba(255,255,255,0.9)", 
+                        fontSize: "1rem", fontWeight: 700, color: isLink ? "#E2E8F0" : "#F8FAFF", 
                         letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
                       }}>
                         {item.value}
@@ -289,10 +301,25 @@ export default function ContactSection() {
       </div>
 
       <style>{`
+        .contact-left-card { min-width: 0; }
+        .contact-right-col { min-width: 0; }
+        .contact-info-panel { width: 100%; }
+        .contact-info-item { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .contact-info-item:hover { transform: translateY(-2px); box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), 0 10px 18px rgba(0,0,0,0.18); }
+
         @media (min-width: 768px) {
-          .contact-grid { grid-template-columns: 3fr 2fr !important; }
+          .contact-grid { grid-template-columns: 1.5fr 1fr !important; }
           .form-2col { grid-template-columns: 1fr 1fr !important; }
         }
+
+        @media (min-width: 960px) {
+          .contact-grid { grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr) !important; gap: 3rem !important; align-items: start; }
+          .contact-right-col { display: grid; gap: 1.75rem; align-self: start; }
+          .contact-speech { align-items: flex-start; }
+          .contact-info-panel { padding: 2rem !important; gap: 1rem; }
+          .contact-item { padding: 0.9rem 1rem !important; }
+        }
+
         @media (max-width: 640px) {
           .form-2col { grid-template-columns: 1fr !important; }
         }

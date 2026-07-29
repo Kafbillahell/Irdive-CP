@@ -18,7 +18,7 @@ export const SECTION_IDS = ["home", "about", "services", "portfolio", "contact",
 
 // ── Hero ──────────────────────────────────────────────────────
 export const HERO = {
-  headline: "Tampil Lebih Profesional\ndi Dunia Digital.",
+  headline: "Tampil Lebih Profesional\ndi Dunia Digital",
   subheadline:
     "IRDIVE membantu bisnis Indonesia membangun website dan aplikasi web yang cepat, terlihat profesional, dan benar-benar berdampak nyata pada pertumbuhan bisnis.",
   ctaPrimary:   { label: "Konsultasi Gratis", href: "#contact" },

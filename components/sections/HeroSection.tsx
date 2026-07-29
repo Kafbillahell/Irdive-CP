@@ -113,6 +113,7 @@ export default function HeroSection() {
   });
 
   const headlineLines = HERO.headline.split("\n");
+  const subheadlineParts = HERO.subheadline.split(/(IRDIVE)/g);
 
   return (
     <section
@@ -166,9 +167,17 @@ export default function HeroSection() {
             {/* Subheadline */}
             <motion.p
               {...fadeUp(0.3)}
-              style={{ fontSize: "clamp(0.9rem, 1.8vw, 1.35rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: 580 }}
+              style={{ fontFamily: "var(--font-body)", fontSize: "clamp(0.9rem, 1.8vw, 1.35rem)", color: "var(--theme-text)", opacity: 0.85, lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: 580 }}
             >
-              {HERO.subheadline}
+              {subheadlineParts.map((part, index) =>
+                part === "IRDIVE" ? (
+                  <strong key={index} style={{ fontWeight: 700, color: "inherit" }}>
+                    {part}
+                  </strong>
+                ) : (
+                  <span key={index}>{part}</span>
+                )
+              )}
             </motion.p>
 
             {/* CTA */}
@@ -244,6 +253,7 @@ export default function HeroSection() {
           }
           .hero-mascot-col { 
             order: 2 !important;
+            transform: translateY(-1.5rem) !important;
           }
         }
       `}</style>
