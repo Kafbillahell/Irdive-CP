@@ -74,7 +74,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
     });
   }, { scope: ref });
 
-  return (
+      return (
     <motion.div
       ref={ref}
       initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
@@ -83,7 +83,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
       style={{
         flexShrink: 0,
         scrollSnapAlign: "center",
-        width: "85vw",
+        width: "min(72vw, 340px)",
         maxWidth: 380,
         height: 480, // Fixed height for absolute image cover layout
         position: "relative",
@@ -445,7 +445,7 @@ export default function PortfolioSection() {
                 display: "flex",
                 gap: "1.5rem",
                 padding: "2rem 5vw 4rem 5vw",
-                overflowX: "hidden",
+                overflowX: "auto",
                 scrollSnapType: "x mandatory",
                 WebkitOverflowScrolling: "touch",
                 perspective: 1400,
