@@ -46,7 +46,7 @@ export default function AboutSection() {
       id="about"
       style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
-      <SectionBg variant="dots-tl" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
+      <SectionBg variant="mascot-left" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
       <div className="container">
 
         {/* Top: editorial label + tagline row */}

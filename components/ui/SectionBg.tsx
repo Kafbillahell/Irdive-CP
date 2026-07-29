@@ -3,75 +3,23 @@
 import Image from "next/image";
 
 export type SectionBgVariant =
-  | "dots-tl"      // dot grid top-left
-  | "dots-br"      // dot grid bottom-right
-  | "dots-tr"      // dot grid top-right
-  | "ring-right"   // decorative ring right edge
-  | "ring-left"    // decorative ring left edge
   | "mascot-right" // faint mascot watermark right
   | "mascot-left"  // faint mascot watermark left
-  | "full";        // all decorations combined
+  | "rings-only"   // just subtle rings
+  | "full";        // mascot right + subtle rings + professional lines
 
 interface SectionBgProps {
   variant?: SectionBgVariant;
-  /** mascot image src — defaults to mascot-1.png */
+  /** mascot image src */
   mascotSrc?: string;
-  /** opacity of mascot watermark, default 0.05 */
+  /** opacity of mascot watermark, default 0.04 */
   mascotOpacity?: number;
-  /** primary dot color */
-  dotColor?: string;
-  /** accent dot color */
-  dotAccent?: string;
 }
 
-/** Dot grid helper */
-function DotGrid({
-  rows = 5,
-  cols = 6,
-  color = "#2196F3",
-  accent = "#4CAF50",
-  style,
-}: {
-  rows?: number;
-  cols?: number;
-  color?: string;
-  accent?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        display: "grid",
-        gridTemplateColumns: `repeat(${cols}, 10px)`,
-        gap: 10,
-        opacity: 0.3,
-        zIndex: 0,
-        pointerEvents: "none",
-        ...style,
-      }}
-    >
-      {Array.from({ length: rows * cols }).map((_, i) => (
-        <span
-          key={i}
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: "50%",
-            background: i % (cols + 1) === 0 ? accent : color,
-            display: "block",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/** Decorative ring */
-function Ring({
-  size = 280,
-  borderWidth = 30,
+/** Decorative modern ring */
+function SubtleRing({
+  size = 400,
+  borderWidth = 1,
   style,
 }: {
   size?: number;
@@ -86,8 +34,8 @@ function Ring({
         width: size,
         height: size,
         borderRadius: "50%",
-        border: `${borderWidth}px solid var(--blue-light, #E3F2FD)`,
-        opacity: 0.5,
+        border: `${borderWidth}px solid var(--theme-border)`,
+        opacity: 0.15,
         zIndex: 0,
         pointerEvents: "none",
         ...style,
@@ -99,97 +47,50 @@ function Ring({
 export default function SectionBg({
   variant = "full",
   mascotSrc = "/mascot-1.png",
-  mascotOpacity = 0.055,
-  dotColor = "#2196F3",
-  dotAccent = "#4CAF50",
+  mascotOpacity = 0.04,
 }: SectionBgProps) {
-  const hasDotsTL  = ["dots-tl", "full"].includes(variant);
-  const hasDotsBR  = ["dots-br", "full"].includes(variant);
-  const hasDotsTR  = ["dots-tr", "full"].includes(variant);
-  const hasRingR   = ["ring-right", "full"].includes(variant);
-  const hasRingL   = ["ring-left", "full"].includes(variant);
   const hasMascotR = ["mascot-right", "full"].includes(variant);
   const hasMascotL = ["mascot-left"].includes(variant);
-
+  const hasRings   = ["rings-only", "full"].includes(variant);
+  
   return (
-    <>
-      {/* ── Dot grids ── */}
-      {hasDotsTL && (
-        <DotGrid
-          rows={4} cols={5}
-          color={dotColor} accent={dotAccent}
-          style={{ top: "8%", left: "2%" }}
-        />
-      )}
-      {hasDotsBR && (
-        <DotGrid
-          rows={4} cols={5}
-          color={dotColor} accent={dotAccent}
-          style={{ bottom: "8%", right: "2%" }}
-        />
-      )}
-      {hasDotsTR && (
-        <DotGrid
-          rows={3} cols={4}
-          color={dotColor} accent={dotAccent}
-          style={{ top: "5%", right: "5%" }}
-        />
+    <div 
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        top: 0, left: 0, right: 0, bottom: 0,
+        overflow: "hidden",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+      {/* ── Professional faint architectural lines (only on full) ── */}
+      {variant === "full" && (
+        <>
+          <div style={{ position: "absolute", left: "10%", top: 0, bottom: 0, width: 1, background: "var(--theme-border)", opacity: 0.05 }} />
+          <div style={{ position: "absolute", right: "10%", top: 0, bottom: 0, width: 1, background: "var(--theme-border)", opacity: 0.05 }} />
+        </>
       )}
 
-      {/* ── Decorative rings ── */}
-      {hasRingR && (
-        <Ring
-          size={340}
-          borderWidth={36}
-          style={{ top: "10%", right: "-80px" }}
-        />
-      )}
-      {hasRingL && (
-        <Ring
-          size={260}
-          borderWidth={28}
-          style={{ bottom: "10%", left: "-70px" }}
-        />
+      {/* ── Subtle Geometric Rings ── */}
+      {hasRings && (
+        <>
+          <SubtleRing size={500} style={{ top: "-10%", right: "-10%" }} />
+          <SubtleRing size={300} style={{ bottom: "10%", left: "-5%" }} />
+        </>
       )}
 
-      {/* ── Mascot watermark ── */}
+      {/* ── Mascot Watermark ── */}
       {hasMascotR && (
         <div
-          aria-hidden="true"
           style={{
             position: "absolute",
             right: "-2%",
-            bottom: "-4%",
-            width: "clamp(200px, 28vw, 420px)",
+            bottom: "0%",
+            width: "clamp(300px, 45vw, 600px)",
             aspectRatio: "1",
             opacity: mascotOpacity,
-            zIndex: 0,
-            pointerEvents: "none",
-            filter: "grayscale(20%) blur(1px)",
-          }}
-        >
-          <Image
-            src={mascotSrc}
-            alt=""
-            fill
-            style={{ objectFit: "contain" }}
-            loading="lazy"
-          />
-        </div>
-      )}
-      {hasMascotL && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            left: "-2%",
-            bottom: "-4%",
-            width: "clamp(180px, 24vw, 380px)",
-            aspectRatio: "1",
-            opacity: mascotOpacity,
-            zIndex: 0,
-            pointerEvents: "none",
-            filter: "grayscale(20%) blur(1px)",
+            filter: "grayscale(30%)",
           }}
         >
           <Image
@@ -202,37 +103,27 @@ export default function SectionBg({
         </div>
       )}
 
-      {/* ── Corner accent squares (geometric detail) ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: "15%",
-          left: "1.5%",
-          width: 6,
-          height: 6,
-          background: dotAccent,
-          borderRadius: 1,
-          opacity: 0.4,
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: "20%",
-          right: "3%",
-          width: 8,
-          height: 8,
-          background: dotColor,
-          borderRadius: 1,
-          opacity: 0.35,
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
-    </>
+      {hasMascotL && (
+        <div
+          style={{
+            position: "absolute",
+            left: "-5%",
+            bottom: "5%",
+            width: "clamp(250px, 35vw, 500px)",
+            aspectRatio: "1",
+            opacity: mascotOpacity,
+            filter: "grayscale(30%)",
+          }}
+        >
+          <Image
+            src={mascotSrc}
+            alt=""
+            fill
+            style={{ objectFit: "contain" }}
+            loading="lazy"
+          />
+        </div>
+      )}
+    </div>
   );
 }

@@ -340,7 +340,7 @@ export default function PortfolioSection() {
       id="portfolio"
       style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
-      <SectionBg variant="ring-left" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
+      <SectionBg variant="mascot-right" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
       <div className="container">
         {/* Header */}
         <div

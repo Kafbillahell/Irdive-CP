@@ -93,15 +93,14 @@ function HeroParallaxMascot({ shouldReduceMotion }: { shouldReduceMotion: boolea
   return (
     <motion.div
       ref={container}
+      className="hero-mascot-col"
       initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.9, delay: 0, ease: [0.22, 1, 0.36, 1] }}
-      style={{ display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}
+      style={{ position: "relative" }}
     >
-      <div className="hero-mascot-col">
-        <div ref={mascotInner} className="mascot-inner" style={{ position: "relative", zIndex: 1 }}>
-          <MascotCarousel />
-        </div>
+      <div ref={mascotInner} className="mascot-inner" style={{ position: "relative", zIndex: 1, width: "100%", display: "flex", justifyContent: "center" }}>
+        <MascotCarousel />
       </div>
     </motion.div>
   );
@@ -161,7 +160,7 @@ export default function HeroSection() {
                   key={i}
                   {...fadeUp(0.15 + i * 0.08)}
                   className={spaceGrotesk.className}
-                  style={{ display: "block", fontSize: "clamp(1.5rem, 6vw, 5rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
+                  style={{ display: "block", fontSize: "clamp(2rem, 7vw, 6rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
                 >
                   {line}
                 </motion.span>
@@ -171,7 +170,7 @@ export default function HeroSection() {
             {/* Subheadline */}
             <motion.p
               {...fadeUp(0.3)}
-              style={{ fontSize: "clamp(0.85rem, 3vw, 1.125rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.6, marginBottom: "2rem", maxWidth: 520 }}
+              style={{ fontSize: "clamp(0.9rem, 1.8vw, 1.35rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: 580 }}
             >
               {HERO.subheadline}
             </motion.p>

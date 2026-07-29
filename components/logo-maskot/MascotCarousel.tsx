@@ -23,24 +23,48 @@ export default function MascotCarousel() {
   /** slot 0 = front, slot 1 = back-right, slot 2 = back-left */
   const slotOf = (i: number) => (i - front + 3) % 3;
 
-  const SLOT: Record<number, { translateX: string; translateY: string; scale: number; opacity: number; zIndex: number }> = {
-    0: { translateX: "0%",   translateY: "30px",  scale: 1,    opacity: 1,   zIndex: 3 },
-    1: { translateX: "90px", translateY: "-40px", scale: 0.58, opacity: 0.72, zIndex: 1 },
-    2: { translateX: "-90px",translateY: "-40px", scale: 0.58, opacity: 0.72, zIndex: 1 },
-  };
-
   return (
     <div
       aria-label="IRDIVE mascot carousel"
+      className="carousel-container"
       style={{
         position: "relative",
         width: "100%",
-        maxWidth: 340,
-        height: 310,
         margin: "0 auto",
-        /* no overflow hidden! */
       }}
     >
+      <style>{`
+        .carousel-container {
+          max-width: 380px;
+          height: 320px;
+        }
+        .carousel-anchor {
+          width: 200px;
+          height: 200px;
+          left: -100px;
+          top: -100px;
+        }
+        .slot-0 { transform: translate(0%, 30px) scale(1); z-index: 3; opacity: 1; filter: drop-shadow(0 16px 32px rgba(33,150,243,0.25)); }
+        .slot-1 { transform: translate(90px, -40px) scale(0.6); z-index: 1; opacity: 0.7; filter: drop-shadow(0 8px 16px rgba(33,150,243,0.1)); }
+        .slot-2 { transform: translate(-90px, -40px) scale(0.6); z-index: 1; opacity: 0.7; filter: drop-shadow(0 8px 16px rgba(33,150,243,0.1)); }
+        
+        @media (min-width: 960px) {
+          .carousel-container {
+            max-width: 550px;
+            height: 480px;
+          }
+          .carousel-anchor {
+            width: 320px;
+            height: 320px;
+            left: -160px;
+            top: -160px;
+          }
+          .slot-0 { transform: translate(0%, 40px) scale(1); }
+          .slot-1 { transform: translate(140px, -60px) scale(0.65); }
+          .slot-2 { transform: translate(-140px, -60px) scale(0.65); }
+        }
+      `}</style>
+      
       {/* Soft backdrop glow */}
       <div
         aria-hidden="true"
@@ -49,10 +73,10 @@ export default function MascotCarousel() {
           left: "50%",
           top: "55%",
           transform: "translate(-50%, -50%)",
-          width: 200,
-          height: 200,
+          width: "70%",
+          aspectRatio: "1",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(33,150,243,0.13) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(33,150,243,0.1) 0%, transparent 70%)",
           pointerEvents: "none",
           zIndex: 0,
         }}
@@ -70,20 +94,12 @@ export default function MascotCarousel() {
       >
         {MASCOTS.map((m, i) => {
           const slot = slotOf(i);
-          const { translateX, translateY, scale, opacity, zIndex } = SLOT[slot];
           return (
             <div
               key={m.src}
+              className={`carousel-anchor slot-${slot}`}
               style={{
                 position: "absolute",
-                /* anchor to top-left of the 200x200 image centered on origin */
-                left: -100,
-                top: -100,
-                width: 200,
-                height: 200,
-                zIndex,
-                opacity,
-                transform: `translate(${translateX}, ${translateY}) scale(${scale})`,
                 transition: prefersReduced
                   ? "none"
                   : "transform 0.65s cubic-bezier(0.22,1,0.36,1), opacity 0.5s ease",
@@ -120,8 +136,8 @@ export default function MascotCarousel() {
             onClick={() => setFront(i)}
             aria-label={`Mascot ${i + 1}`}
             style={{
-              width: slotOf(i) === 0 ? 20 : 7,
-              height: 7,
+              width: slotOf(i) === 0 ? 24 : 8,
+              height: 8,
               borderRadius: 4,
               border: "none",
               cursor: "pointer",

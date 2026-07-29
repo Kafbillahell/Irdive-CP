@@ -65,7 +65,7 @@ export default function ContactSection() {
       id="contact"
       style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
-      <SectionBg variant="dots-br" mascotSrc="/mascot-2.png" mascotOpacity={0.04} />
+      <SectionBg variant="mascot-left" mascotSrc="/mascot-2.png" mascotOpacity={0.04} />
       <div className="container">
         {/* Header */}
         <motion.div
