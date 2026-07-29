@@ -239,7 +239,7 @@ export default function ServicesSection() {
       id="services"
       style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
-      <SectionBg variant="mascot-right" mascotSrc="/mascot-1.png" mascotOpacity={0.045} />
+      <SectionBg variant="mascot-right" mascotSrc="/mascot-1.png" mascotOpacity={0.045} dark={true} />
       <div className="container">
         {/* Header */}
         <div style={{ marginBottom: "3.5rem" }}>

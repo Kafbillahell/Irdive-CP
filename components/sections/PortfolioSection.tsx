@@ -1,339 +1,335 @@
 'use client';
 
-import { useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Syne } from "next/font/google";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { PORTFOLIO_ITEMS, type PortfolioItem } from "@/lib/content";
 import SectionBg from "@/components/ui/SectionBg";
 
-const syne = Syne({ subsets: ["latin"], weight: ["700", "800"] });
-
 const EASING = [0.22, 1, 0.36, 1] as const;
 
+// Icon per portfolio item category
+const PORTFOLIO_ICONS: Record<string, React.ReactNode> = {
+  featured: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </svg>
+  ),
+  website: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <path d="M8 21h8M12 17v4" />
+    </svg>
+  ),
+  system: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <rect x="5" y="2" width="14" height="20" rx="2" />
+      <path d="M9 7h6M9 11h6M9 15h4" />
+    </svg>
+  ),
+  landing: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 17l10 5 10-5" />
+      <path d="M2 12l10 5 10-5" />
+    </svg>
+  ),
+};
+
 function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) {
-  const ref = useRef(null);
+  const ref  = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const shouldReduce = useReducedMotion();
-  const [hovered, setHovered] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
 
-  const isWide = item.span === "wide";
+  // Placeholder images based on index, looking professional (coding, tech, abstract dark)
+  const placeholderImages = [
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
+  ];
+  const bgImage = placeholderImages[index % placeholderImages.length];
+
+  useGSAP(() => {
+    if (shouldReduce) return;
+    const mm = gsap.matchMedia();
+
+    mm.add("(hover: hover) and (pointer: fine)", () => {
+      const xTo = gsap.quickTo(glowRef.current, "x", { duration: 0.4, ease: "power3" });
+      const yTo = gsap.quickTo(glowRef.current, "y", { duration: 0.4, ease: "power3" });
+
+      const handleMove = (e: MouseEvent) => {
+        const rect = ref.current?.getBoundingClientRect();
+        if (!rect) return;
+        xTo(e.clientX - rect.left);
+        yTo(e.clientY - rect.top);
+      };
+      const handleEnter = () => gsap.to(glowRef.current, { opacity: 1, duration: 0.3 });
+      const handleLeave = () => gsap.to(glowRef.current, { opacity: 0, duration: 0.3 });
+
+      ref.current?.addEventListener("mousemove",  handleMove);
+      ref.current?.addEventListener("mouseenter", handleEnter);
+      ref.current?.addEventListener("mouseleave", handleLeave);
+      return () => {
+        ref.current?.removeEventListener("mousemove",  handleMove);
+        ref.current?.removeEventListener("mouseenter", handleEnter);
+        ref.current?.removeEventListener("mouseleave", handleLeave);
+      };
+    });
+  }, { scope: ref });
 
   return (
-    <>
-      <motion.article
-        ref={ref}
-        initial={shouldReduce ? {} : { clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", scale: 1.05 }}
-        whileInView={shouldReduce ? {} : { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", scale: 1 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ duration: 0.85, delay: 0.08 * (index % 3), ease: EASING }}
-        className={isWide ? "portfolio-wide" : ""}
+    <motion.div
+      ref={ref}
+      initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay: 0.07 * (index % 3), ease: EASING }}
+      style={{
+        flexShrink: 0,
+        scrollSnapAlign: "center",
+        width: "85vw",
+        maxWidth: 380,
+        height: 480, // Fixed height for absolute image cover layout
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: 24, // softer radius
+        border: "1px solid rgba(255,255,255,0.1)",
+        background: "#0A0A0A", // Base dark before image
+        boxShadow: "0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)", // Elegant deeper 3D lighting for dark cards
+        cursor: "grab",
+        transition: "border-color 0.4s, transform 0.4s",
+        transformStyle: "preserve-3d",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end", // content pushed to bottom over the image gradient
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.3)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.1)";
+      }}
+      onMouseDown={(e) => (e.currentTarget.style.cursor = "grabbing")}
+      onMouseUp={(e) => (e.currentTarget.style.cursor = "grab")}
+    >
+      {/* ── Background Image ── */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        zIndex: 0,
+        transition: "transform 0.5s ease-out",
+        filter: "brightness(0.8)",
+      }} className="pf-bg-img" />
+
+      {/* ── Gradient Overlay for Text Readability ── */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 60%, rgba(0,0,0,0.95) 100%)",
+        zIndex: 0,
+      }} />
+
+      {/* Mouse-follow glow */}
+      <div
+        ref={glowRef}
+        aria-hidden
         style={{
-          borderRadius: 18,
-          overflow: "hidden",
-          cursor: "pointer",
-          position: "relative",
-          border: "1px solid var(--theme-border)",
-          background: "transparent",
-          minHeight: isWide ? 260 : 220,
+          position: "absolute",
+          width: 240,
+          height: 240,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)`,
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+          opacity: 0,
+          zIndex: 1,
+          mixBlendMode: "overlay",
         }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onClick={() => setModalOpen(true)}
-        aria-label={`View project: ${item.title}`}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e: React.KeyboardEvent) => e.key === "Enter" && setModalOpen(true)}
-      >
-        {/* Color block top */}
-        <div
-          className="pf-banner"
-          style={{
-            background: `linear-gradient(135deg, ${item.accentColor}18 0%, ${item.accentColor}08 100%)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-            overflow: "hidden",
-            transition: "height 0.3s",
-          }}
-        >
-          {/* Abstract pattern */}
+      />
+
+      {/* ── Card Content ── */}
+      <div style={{ padding: "2rem", position: "relative", zIndex: 2, display: "flex", flexDirection: "column" }}>
+        
+        {/* Category tag */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
           <div
-            aria-hidden
             style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage: `radial-gradient(circle at 30% 50%, ${item.accentColor}25 0%, transparent 50%), radial-gradient(circle at 80% 20%, ${item.accentColor}15 0%, transparent 40%)`,
-            }}
-          />
-          <span
-            className={syne.className}
-            style={{
-              fontSize: "clamp(1.5rem, 5vw, 2.8rem)",
-              fontWeight: 800,
-              color: item.accentColor,
-              opacity: 0.15,
-              letterSpacing: "-0.04em",
-              position: "relative",
-              zIndex: 1,
-              userSelect: "none",
-            }}
-          >
-            {item.title.slice(0, 2).toUpperCase()}
-          </span>
-
-          {/* Category badge */}
-          <span
-            style={{
-              position: "absolute",
-              top: "1rem",
-              left: "1rem",
-              background: `${item.accentColor}18`,
-              color: item.accentColor,
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              padding: "3px 10px",
-              borderRadius: 20,
-              border: `1px solid ${item.accentColor}28`,
-            }}
-          >
-            {item.categoryLabel}
-          </span>
-
-          {/* Hover overlay */}
-          <AnimatePresence>
-            {hovered && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "rgba(30,35,40,0.65)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 2,
-                }}
-              >
-                <motion.span
-                  initial={{ y: 12, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 8, opacity: 0 }}
-                  transition={{ duration: 0.22, ease: EASING }}
-                  style={{
-                    background: "white",
-                    color: "#1E2328",
-                    fontWeight: 700,
-                    fontSize: "0.875rem",
-                    padding: "0.5rem 1.25rem",
-                    borderRadius: 10,
-                  }}
-                >
-                  Lihat Detail →
-                </motion.span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Card body */}
-        <div className="pf-body">
-          <h3
-            className={syne.className}
-            style={{
-              fontWeight: 700,
-              fontSize: "clamp(0.85rem, 3vw, 1.1rem)",
-              color: "var(--theme-text)",
-              marginBottom: "0.25rem",
-              lineHeight: 1.2
-            }}
-          >
-            {item.title}
-          </h3>
-          <div className="pf-tech">
-            {item.tech.map((t) => (
-              <span
-                key={t}
-                style={{
-                  fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)",
-                  fontWeight: 600,
-                  color: "#6B7280",
-                  background: "#F3F4F6",
-                  padding: "2px 8px",
-                  borderRadius: 6,
-                }}
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        </div>
-      </motion.article>
-
-      {/* Modal */}
-      <AnimatePresence>
-        {modalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(30,35,40,0.6)",
-              zIndex: 200,
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: `rgba(255,255,255,0.1)`,
+              border: `1px solid rgba(255,255,255,0.2)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "1.5rem",
+              color: "#FFF",
+              backdropFilter: "blur(10px)",
             }}
-            onClick={() => setModalOpen(false)}
           >
-            <motion.div
-              initial={{ scale: 0.92, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.94, opacity: 0, y: 12 }}
-              transition={{ duration: 0.3, ease: EASING }}
-              style={{
-                background: "white",
-                borderRadius: 20,
-                maxWidth: 540,
-                width: "100%",
-                overflow: "hidden",
-                boxShadow: "0 24px 64px rgba(30,35,40,0.22)",
-              }}
-              onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            >
-              {/* Modal header */}
-              <div
-                style={{
-                  background: `linear-gradient(135deg, ${item.accentColor}22 0%, ${item.accentColor}08 100%)`,
-                  padding: "2rem 2rem 1.5rem",
-                  position: "relative",
-                }}
-              >
-                <button
-                  onClick={() => setModalOpen(false)}
-                  aria-label="Tutup"
-                  style={{
-                    position: "absolute",
-                    top: "1rem",
-                    right: "1rem",
-                    background: "rgba(255,255,255,0.8)",
-                    border: "none",
-                    borderRadius: 8,
-                    width: 32,
-                    height: 32,
-                    cursor: "pointer",
-                    fontSize: "1rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#4B5563",
-                  }}
-                >
-                  ✕
-                </button>
-                <span
-                  style={{
-                    background: `${item.accentColor}20`,
-                    color: item.accentColor,
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    padding: "3px 10px",
-                    borderRadius: 20,
-                    display: "inline-block",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {item.categoryLabel}
-                </span>
-                <h2
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "1.5rem",
-                    fontWeight: 800,
-                    color: "#1E2328",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  {item.title}
-                </h2>
-              </div>
+            {PORTFOLIO_ICONS[item.category]}
+          </div>
+          <span style={{
+            fontSize: "0.65rem",
+            fontWeight: 700,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+            color: "#FFF",
+            background: `rgba(255,255,255,0.1)`,
+            border: `1px solid rgba(255,255,255,0.1)`,
+            padding: "4px 12px",
+            borderRadius: 20,
+            backdropFilter: "blur(10px)",
+          }}>
+            {item.categoryLabel}
+          </span>
+        </div>
 
-              {/* Modal body */}
-              <div style={{ padding: "1.5rem 2rem 2rem" }}>
-                <p style={{ color: "#4B5563", lineHeight: 1.7, marginBottom: "1.5rem" }}>
-                  {item.description}
-                </p>
-                <div style={{ marginBottom: "1.5rem" }}>
-                  <p
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      color: "#9CA3AF",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    Tech Stack
-                  </p>
-                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                    {item.tech.map((t) => (
-                      <span
-                        key={t}
-                        style={{
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                          color: item.accentColor,
-                          background: `${item.accentColor}14`,
-                          padding: "4px 12px",
-                          borderRadius: 8,
-                          border: `1px solid ${item.accentColor}28`,
-                        }}
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#9CA3AF",
-                    fontStyle: "italic",
-                    background: "#F9FAFB",
-                    padding: "0.75rem 1rem",
-                    borderRadius: 10,
-                    border: "1px solid #F3F4F6",
-                  }}
-                >
-                  * Ini adalah contoh portfolio. Detail proyek nyata akan ditampilkan setelah live.
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        {/* Title */}
+        <h3 style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
+          color: "#FFF",
+          marginBottom: "0.5rem",
+          lineHeight: 1.2,
+          textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+        }}>
+          {item.title}
+        </h3>
+
+        {/* Description */}
+        <p style={{
+          fontSize: "clamp(0.8rem, 2vw, 0.95rem)",
+          color: "rgba(255,255,255,0.75)",
+          lineHeight: 1.6,
+        }}>
+          {item.description}
+        </p>
+
+        {/* Tech tags */}
+        <div style={{
+          display: "flex",
+          gap: "0.4rem",
+          flexWrap: "wrap",
+          marginTop: "1.25rem",
+        }}>
+          {item.tech.map((t) => (
+            <span key={t} style={{
+              fontSize: "0.65rem",
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.8)",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              backdropFilter: "blur(10px)",
+              padding: "4px 10px",
+              borderRadius: 6,
+            }}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
 export default function PortfolioSection() {
-  const headerRef = useRef(null);
-  const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
-  const shouldReduce = useReducedMotion();
+  const headerRef     = useRef(null);
+  const sliderRef     = useRef<HTMLDivElement>(null);
+  const headerInView  = useInView(headerRef, { once: true, margin: "-80px" });
+  const shouldReduce  = useReducedMotion();
+
+  // 3D Coverflow Effect Logic
+  useGSAP(() => {
+    if (shouldReduce || !sliderRef.current) return;
+    
+    // We use a simple rAF loop to calculate the distance of each card 
+    // from the center of the viewport and apply a rotateY and scale.
+    let rafId: number;
+    const cards = sliderRef.current.querySelectorAll('.pf-card-wrapper');
+    const bubbles = document.querySelectorAll('.pf-bubble-indicator');
+    
+    const update3D = () => {
+      if (!sliderRef.current) return;
+      const sliderCenter = sliderRef.current.getBoundingClientRect().width / 2;
+      
+      let closestIdx = 0;
+      let minDistance = Infinity;
+
+      cards.forEach((cardEl, idx) => {
+        const el = cardEl as HTMLElement;
+        const rect = el.getBoundingClientRect();
+        // Calculate center of this specific card relative to the viewport
+        const cardCenter = rect.left + rect.width / 2;
+        
+        // Distance from center of window
+        const windowCenter = window.innerWidth / 2;
+        const dist = cardCenter - windowCenter;
+        
+        const absDistForActive = Math.abs(dist);
+        if (absDistForActive < minDistance) {
+          minDistance = absDistForActive;
+          closestIdx = idx;
+        }
+
+        // Max rotation angle
+        const maxRotate = 22; 
+        
+        // Map distance to rotation (-max to +max)
+        let rotateY = (dist / window.innerWidth) * maxRotate * 2.8; 
+        
+        // Clamp rotation
+        if (rotateY > maxRotate) rotateY = maxRotate;
+        if (rotateY < -maxRotate) rotateY = -maxRotate;
+        
+        // Scale down slightly as it moves away from center, adding depth
+        const absDist = Math.abs(rotateY) / maxRotate;
+        const scale = 1 - (absDist * 0.1);
+        const z = -absDist * 50; // Push back in Z space
+        const zIndex = Math.round((1 - absDist) * 100);
+
+        // Enhance 3D effect with Z translation
+        el.style.transform = `perspective(1200px) translateZ(${z}px) rotateY(${rotateY}deg) scale(${scale})`;
+        el.style.zIndex = zIndex.toString();
+        // Add dynamic box-shadow based on tilt for elegant lighting
+        const shadowOffset = rotateY * -1; // opposite to tilt
+        el.style.filter = `drop-shadow(${shadowOffset}px 20px 30px rgba(0,0,0,${0.05 + (absDist * 0.1)}))`;
+      });
+
+      // Update bubbles
+      bubbles.forEach((bubble, idx) => {
+        const b = bubble as HTMLElement;
+        if (idx === closestIdx) {
+          b.style.transform = "scale(1.5) translateY(-4px)";
+          b.style.background = "var(--theme-accent)"; // Active gets the primary brand color
+          b.style.boxShadow = "0 6px 12px rgba(33, 150, 243, 0.3), inset 0 -2px 6px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.6)";
+          b.style.borderColor = "rgba(0,0,0,0.1)";
+          b.style.opacity = "1";
+        } else {
+          // Add a subtle wave float based on distance
+          const floatOffset = Math.abs(idx - closestIdx) * 1.5;
+          b.style.transform = `scale(1) translateY(${floatOffset}px)`;
+          b.style.background = "rgba(0, 0, 0, 0.06)"; // Darker tint for light backgrounds
+          b.style.boxShadow = "inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.05), 0 2px 5px rgba(0,0,0,0.05)";
+          b.style.borderColor = "rgba(0,0,0,0.08)";
+          b.style.opacity = "0.7";
+        }
+      });
+
+      rafId = requestAnimationFrame(update3D);
+    };
+    rafId = requestAnimationFrame(update3D);
+
+    return () => cancelAnimationFrame(rafId);
+  }, { scope: sliderRef });
 
   return (
     <section
@@ -341,81 +337,114 @@ export default function PortfolioSection() {
       style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
       <SectionBg variant="mascot-right" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
-      <div className="container">
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginBottom: "3rem",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
+
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div className="container">
+          {/* Header */}
           <motion.div
             ref={headerRef}
             initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: EASING }}
+            style={{ marginBottom: "3rem" }}
           >
             <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
               Portfolio
             </span>
-            <h2 className={syne.className} style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1.1, letterSpacing: "-0.03em", color: "var(--theme-text)" }}>
-              Karya yang<br />
-              kami <span style={{ color: "var(--theme-accent)" }}>banggakan.</span>
-            </h2>
-          </motion.div>
-
-          <motion.p
-            initial={shouldReduce ? {} : { opacity: 0 }}
-            animate={headerInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.2, ease: EASING }}
-            style={{ color: "#6B7280", maxWidth: 280, fontSize: "0.95rem", lineHeight: 1.6 }}
-          >
-            Klik setiap card untuk lihat detail project, tech stack, dan proses pengerjaannya.
-          </motion.p>
+            <h2 style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(2rem, 4vw, 3.5rem)",
+            lineHeight: 1.1,
+            letterSpacing: "-0.03em",
+            color: "var(--theme-text)",
+            marginBottom: "1rem",
+          }}>
+            Karya yang kami <span style={{ color: "var(--theme-accent)" }}>banggakan</span>
+          </h2>
+          
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "1.5rem", flexDirection: "column" }}>
+            <p style={{ color: "var(--theme-text)", opacity: 0.6, maxWidth: 480, fontSize: "0.95rem", lineHeight: 1.6, margin: 0 }}>
+              Proyek-proyek yang mencerminkan cara kerja dan standar kualitas yang kami terapkan di setiap kolaborasi.
+            </p>
+          </div>
+        </motion.div>
         </div>
 
-        {/* Bento grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "1.25rem",
-          }}
-          className="portfolio-grid"
-        >
-          {PORTFOLIO_ITEMS.map((item, i) => (
-            <PortfolioCard key={item.id} item={item} index={i} />
-          ))}
+        {/* ── Main Outer Frame ("Layar") ── */}
+        <div className="container" style={{ marginTop: "1rem" }}>
+          <div style={{
+            position: "relative",
+            margin: "0 auto",
+            maxWidth: 1200,
+          }}>
+            {/* 3D Carousel Track */}
+            <div 
+              ref={sliderRef}
+              className="hide-scroll"
+              style={{
+                display: "flex",
+                gap: "1.5rem",
+                padding: "2rem 5vw 4rem 5vw", // Padding ensures 3D cards aren't clipped
+                overflowX: "auto",
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              {PORTFOLIO_ITEMS.map((item, i) => (
+                <div key={item.id} className="pf-card-wrapper" style={{ flexShrink: 0, transition: "transform 0.1s cubic-bezier(0.2,0.8,0.2,1)" }}>
+                  <PortfolioCard item={item} index={i} />
+                </div>
+              ))}
+            </div>
+
+            {/* 3D Floating Bubble Pagination Indicators */}
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "12px", // a bit more space for floating bubbles
+              marginTop: "-1rem", /* Pull up closer to cards */
+              paddingBottom: "3rem"
+            }}>
+              {PORTFOLIO_ITEMS.map((item, i) => (
+                <div 
+                  key={`bubble-${item.id}`} 
+                  className="pf-bubble-indicator"
+                  style={{
+                    height: 12,
+                    width: 12,
+                    borderRadius: "50%",
+                    background: "rgba(0,0,0,0.06)",
+                    backdropFilter: "blur(4px)",
+                    boxShadow: "inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.05), 0 2px 5px rgba(0,0,0,0.05)",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s, box-shadow 0.4s",
+                    animation: `float-bubble 3s ease-in-out infinite alternate ${i * 0.2}s`
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       <style>{`
-        .portfolio-grid {
-          grid-template-columns: 1fr 1fr !important;
-          gap: 0.5rem !important;
+        /* Hide scrollbar for clean UI but keep scroll functionality */
+        .hide-scroll {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
-        .pf-banner { height: 90px !important; }
-        .pf-body { padding: 0.75rem !important; }
-        .pf-tech { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .hide-scroll::-webkit-scrollbar {
+          display: none;
+        }
         
-        @media (min-width: 640px) {
-          .portfolio-grid { gap: 1.25rem !important; }
-          .pf-banner { height: 130px !important; }
-          .portfolio-wide .pf-banner { height: 160px !important; }
-          .pf-body { padding: 1.25rem 1.5rem !important; }
-          .pf-tech { gap: 0.5rem; }
-          .portfolio-wide {
-            grid-column: span 2;
-          }
+        .pf-card-wrapper:hover .pf-bg-img {
+          transform: scale(1.05); /* Slight Ken Burns effect on hover */
         }
-        @media (min-width: 1024px) {
-          .portfolio-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
+
+        @keyframes float-bubble {
+          0% { transform: translateY(0px) scale(inherit); }
+          100% { transform: translateY(-4px) scale(inherit); }
         }
       `}</style>
     </section>

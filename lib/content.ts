@@ -20,9 +20,9 @@ export const SECTION_IDS = ["home", "about", "services", "portfolio", "contact",
 export const HERO = {
   headline: "Build Better\nDigital Experiences.",
   subheadline:
-    "IRDIVE membantu bisnis membangun website, web app, dan solusi digital yang cepat, scalable, dan punya dampak nyata.",
-  ctaPrimary: { label: "Konsultasi Gratis", href: "#contact" },
-  ctaSecondary: { label: "Lihat Portfolio", href: "#portfolio" },
+    "IRDIVE membantu bisnis membangun website dan web app yang cepat, terlihat profesional, dan benar-benar berdampak pada pertumbuhan bisnis.",
+  ctaPrimary:   { label: "Konsultasi Gratis", href: "#contact" },
+  ctaSecondary: { label: "Lihat Portfolio",   href: "#portfolio" },
 } as const;
 
 export interface Stat {
@@ -32,34 +32,35 @@ export interface Stat {
 }
 
 export const STATS: Stat[] = [
-  { value: 30, suffix: "+", label: "Projects Delivered" },
-  { value: 25, suffix: "+", label: "Happy Clients" },
-  { value: 3, suffix: "+", label: "Years Experience" },
+  { value: 30, suffix: "+", label: "Proyek Selesai" },
+  { value: 25, suffix: "+", label: "Klien Puas" },
+  { value: 3,  suffix: "+", label: "Tahun Pengalaman" },
 ];
 
 // ── About ─────────────────────────────────────────────────────
 export const ABOUT = {
-  tagline: "Kami bukan sekadar vendor — kami mitra digital yang ikut memikirkan bisnis kamu.",
+  tagline: "Kami terlibat langsung dalam bisnis kamu, bukan cuma bikin desain lalu pergi",
   story:
-    "IRDIVE lahir dari frustrasi melihat bisnis bagus terjebak di website yang buruk. Kami percaya tampilan digital yang baik bukan kemewahan, tapi kebutuhan dasar setiap bisnis modern.",
-  vision: "Menjadi studio digital terpercaya yang membantu bisnis Indonesia tampil lebih baik di dunia digital.",
+    "IRDIVE hadir karena kami melihat terlalu banyak bisnis bagus yang tampil asal-asalan di internet. Website jelek kehilangan kepercayaan klien sebelum mereka sempat ngobrol. Kami ada untuk mengubah itu.",
+  vision:
+    "Menjadi studio digital pilihan bisnis Indonesia yang ingin tampil serius dan tumbuh lewat kanal digital",
   mission:
-    "Membangun produk digital yang tidak hanya cantik secara visual, tapi juga cepat, accessible, dan benar-benar bekerja untuk bisnis klien.",
+    "Membangun produk digital yang terlihat profesional, bekerja cepat, dan memberi hasil nyata bagi bisnis klien",
   values: [
     {
       icon: "⚡",
       title: "Speed First",
-      desc: "Performa bukan bonus — ini standar minimum kami.",
+      desc: "Website lambat kehilangan pengunjung. Performa bukan fitur tambahan, ini hal pertama yang kami jaga.",
     },
     {
       icon: "🎯",
-      title: "Purposeful Design",
-      desc: "Setiap keputusan desain punya alasan dan tujuan bisnis.",
+      title: "Desain Bertujuan",
+      desc: "Setiap pilihan desain ada alasannya. Cantik saja tidak cukup kalau tidak membantu bisnis kamu berkembang.",
     },
     {
       icon: "🤝",
-      title: "Partnership",
-      desc: "Kami ikut memikirkan masalah, bukan hanya eksekusi order.",
+      title: "Kolaborasi Nyata",
+      desc: "Kami ikut duduk dan memikirkan tantangan bisnis kamu, bukan sekadar mengeksekusi brief.",
     },
   ],
 } as const;
@@ -76,33 +77,33 @@ export const SERVICES: Service[] = [
   {
     id: "company-profile",
     title: "Company Profile Website",
-    desc: "Website profesional yang merepresentasikan bisnis kamu dengan desain custom, performa tinggi, dan konten yang bisa dikelola sendiri.",
+    desc: "Website profesional yang merepresentasikan bisnis kamu dengan tepat. Desain custom, performa tinggi, dan mudah dikelola sendiri.",
     featured: true,
   },
   {
     id: "landing-page",
     title: "Landing Page",
-    desc: "Halaman konversi yang dioptimasi untuk menarik leads dan mendorong aksi nyata dari pengunjung.",
+    desc: "Halaman yang dirancang khusus untuk mengkonversi pengunjung menjadi leads atau pelanggan nyata.",
   },
   {
     id: "web-app",
-    title: "Custom Web App",
-    desc: "Aplikasi web yang dibangun sesuai workflow bisnis — dari MVP hingga sistem produksi penuh.",
+    title: "Aplikasi Web Custom",
+    desc: "Aplikasi web yang dibangun sesuai kebutuhan bisnis kamu, mulai dari tahap awal hingga sistem produksi penuh.",
   },
   {
     id: "business-system",
-    title: "Internal Business System",
-    desc: "Dashboard, sistem manajemen, dan tools operasional yang bikin tim kamu bekerja lebih efisien.",
+    title: "Sistem Bisnis Internal",
+    desc: "Dashboard dan tools operasional yang membantu tim kamu bekerja lebih teratur dan hemat waktu.",
   },
   {
     id: "ui-ux",
     title: "UI/UX Design",
-    desc: "Desain antarmuka yang bukan cuma cantik tapi mudah dipakai — riset, wireframe, hingga desain final.",
+    desc: "Desain antarmuka yang nyaman dipakai dan enak dilihat, dari riset pengguna sampai tampilan akhir.",
   },
   {
     id: "maintenance",
     title: "Website Maintenance",
-    desc: "Layanan pemeliharaan berkala supaya website kamu tetap cepat, aman, dan up to date.",
+    desc: "Layanan perawatan rutin agar website kamu tetap cepat, aman, dan selalu up to date.",
   },
 ];
 
@@ -125,60 +126,65 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     category: "featured",
     categoryLabel: "E-Commerce Platform",
     description:
-      "Platform e-commerce dengan sistem manajemen produk, payment gateway, dan dashboard analitik real-time.",
+      "Platform toko online lengkap dengan manajemen produk, pembayaran terintegrasi, dan laporan penjualan real-time.",
     tech: ["Next.js", "PostgreSQL", "Stripe"],
     span: "wide",
-    accentColor: "#2196F3",
+    accentColor: "#1E2328",
   },
   {
     id: "p2",
     title: "Klinik Sehat",
     category: "website",
     categoryLabel: "Company Profile",
-    description: "Website company profile untuk klinik kesehatan modern dengan sistem booking appointment online.",
+    description:
+      "Website klinik kesehatan modern dengan sistem booking appointment yang bisa diakses langsung dari halaman utama.",
     tech: ["Next.js", "Tailwind", "Sanity"],
     span: "normal",
-    accentColor: "#4CAF50",
+    accentColor: "#1E2328",
   },
   {
     id: "p3",
     title: "FinTrack Pro",
     category: "system",
     categoryLabel: "Business System",
-    description: "Sistem manajemen keuangan internal untuk perusahaan distribusi dengan laporan otomatis.",
+    description:
+      "Sistem manajemen keuangan internal untuk perusahaan distribusi. Laporan otomatis dan mudah dibaca.",
     tech: ["React", "Node.js", "MySQL"],
     span: "normal",
-    accentColor: "#2196F3",
+    accentColor: "#1E2328",
   },
   {
     id: "p4",
     title: "Summit Academy",
     category: "landing",
     categoryLabel: "Landing Page",
-    description: "Landing page kursus online dengan conversion rate optimization dan A/B testing.",
+    description:
+      "Landing page kursus online yang dioptimasi untuk konversi, dilengkapi pengujian A/B untuk terus ditingkatkan.",
     tech: ["Next.js", "Framer Motion"],
     span: "wide",
-    accentColor: "#4CAF50",
+    accentColor: "#1E2328",
   },
   {
     id: "p5",
     title: "Logistix Dashboard",
     category: "system",
     categoryLabel: "Business System",
-    description: "Dashboard monitoring logistik dengan tracking real-time dan manajemen armada.",
+    description:
+      "Dashboard pemantauan logistik dengan pelacakan posisi armada secara real-time.",
     tech: ["React", "TypeScript", "Mapbox"],
     span: "normal",
-    accentColor: "#2196F3",
+    accentColor: "#1E2328",
   },
   {
     id: "p6",
     title: "Rasa Kuliner",
     category: "website",
     categoryLabel: "Restaurant Profile",
-    description: "Website restoran dengan menu digital, galeri, dan integrasi reservasi.",
+    description:
+      "Website restoran dengan menu digital interaktif, galeri foto, dan fitur reservasi meja online.",
     tech: ["Next.js", "Contentful"],
     span: "normal",
-    accentColor: "#4CAF50",
+    accentColor: "#1E2328",
   },
 ];
 
@@ -190,7 +196,7 @@ export const CONTACT_INFO = {
   linkedin: "IRDIVE",
   location: "Indonesia",
   waMessage:
-    "Halo IRDIVE! Saya tertarik dengan layanan kalian dan ingin konsultasi lebih lanjut tentang project saya.",
+    "Halo IRDIVE! Saya tertarik dengan layanan kalian dan ingin diskusi lebih lanjut soal project saya.",
 } as const;
 
 // ── Partnerships ──────────────────────────────────────────────
@@ -200,16 +206,16 @@ export interface TechBadge {
 }
 
 export const TECH_STACK: TechBadge[] = [
-  { name: "Next.js", color: "#000000" },
-  { name: "React", color: "#61DAFB" },
-  { name: "TypeScript", color: "#3178C6" },
+  { name: "Next.js",      color: "#000000" },
+  { name: "React",        color: "#61DAFB" },
+  { name: "TypeScript",   color: "#3178C6" },
   { name: "Tailwind CSS", color: "#38B2AC" },
-  { name: "Node.js", color: "#339933" },
-  { name: "PostgreSQL", color: "#336791" },
-  { name: "Vercel", color: "#000000" },
-  { name: "Supabase", color: "#3ECF8E" },
-  { name: "Figma", color: "#F24E1E" },
-  { name: "Framer", color: "#0055FF" },
-  { name: "Sanity", color: "#F03E2F" },
-  { name: "Stripe", color: "#008CDD" },
+  { name: "Node.js",      color: "#339933" },
+  { name: "PostgreSQL",   color: "#336791" },
+  { name: "Vercel",       color: "#000000" },
+  { name: "Supabase",     color: "#3ECF8E" },
+  { name: "Figma",        color: "#F24E1E" },
+  { name: "Framer",       color: "#0055FF" },
+  { name: "Sanity",       color: "#F03E2F" },
+  { name: "Stripe",       color: "#008CDD" },
 ];

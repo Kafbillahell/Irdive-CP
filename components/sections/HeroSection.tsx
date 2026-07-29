@@ -4,12 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
 import SectionBg from "@/components/ui/SectionBg";
-
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 import Button from "@/components/ui/Button";
 import { HERO, STATS } from "@/lib/content";
 
@@ -47,8 +44,8 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
   }, [value, shouldReduceMotion]);
 
   return (
-    <div ref={ref} style={{ textAlign: "left" }}>
-      <div className={spaceGrotesk.className} style={{ fontSize: "2rem", fontWeight: 700, color: "var(--theme-text)", lineHeight: 1, letterSpacing: "-0.04em" }}>
+    <div ref={ref} style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ fontFamily: "var(--font-display)", fontSize: "2rem", fontWeight: 700, color: "var(--theme-text)", lineHeight: 1, letterSpacing: "-0.04em" }}>
         {count}{suffix}
       </div>
       <div style={{ fontSize: "clamp(0.6rem, 2vw, 0.8rem)", color: "var(--theme-text)", opacity: 0.6, marginTop: 4, fontWeight: 500 }}>{label}</div>
@@ -159,8 +156,7 @@ export default function HeroSection() {
                 <motion.span
                   key={i}
                   {...fadeUp(0.15 + i * 0.08)}
-                  className={spaceGrotesk.className}
-                  style={{ display: "block", fontSize: "clamp(2rem, 7vw, 6rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
+                  style={{ fontFamily: "var(--font-display)", display: "block", fontSize: "clamp(2rem, 7vw, 6rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
                 >
                   {line}
                 </motion.span>

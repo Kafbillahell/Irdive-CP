@@ -61,11 +61,11 @@ export default function Navbar() {
           maxWidth: scrolled ? 1168 : "100%",
           zIndex: 100,
           transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
-          background: scrolled ? "rgba(255, 255, 255, 0.75)" : "transparent",
-          backdropFilter: scrolled ? "blur(24px) saturate(1.8)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(1.8)" : "none",
-          boxShadow: scrolled ? "0 4px 32px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)" : "none",
-          border: scrolled ? "1px solid rgba(255, 255, 255, 0.4)" : "1px solid transparent",
+          background: scrolled ? "rgba(255, 255, 255, 0.15)" : "transparent",
+          backdropFilter: scrolled ? "blur(40px) saturate(2)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(40px) saturate(2)" : "none",
+          boxShadow: scrolled ? "0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.15)" : "none",
+          border: scrolled ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid transparent",
           borderRadius: scrolled ? 24 : 0,
         }}
       >

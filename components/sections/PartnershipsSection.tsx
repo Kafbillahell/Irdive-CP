@@ -2,11 +2,9 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Bricolage_Grotesque } from 'next/font/google';
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { TECH_STACK, CONTACT_INFO } from "@/lib/content";
-
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], weight: ["700", "800"] });
+import SectionBg from "@/components/ui/SectionBg";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -21,8 +19,9 @@ export default function PartnershipsSection() {
   return (
     <section
       id="partnerships"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
+      <SectionBg variant="mascot-right" mascotSrc="/mascot-2.png" mascotOpacity={0.04} dark={true} />
       <div className="container">
         {/* Header */}
         <motion.div
@@ -35,7 +34,7 @@ export default function PartnershipsSection() {
           <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
             Teknologi & Kolaborasi
           </span>
-          <h2 className={bricolage.className} style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 520 }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 520 }}>
             Dibangun dengan<br />
             tools <span style={{ color: "var(--theme-accent)" }}>terbaik.</span>
           </h2>
@@ -174,13 +173,13 @@ export default function PartnershipsSection() {
               padding: "2.5rem",
             }}
           >
-            <h3 className={bricolage.className} style={{ fontSize: "1.35rem", fontWeight: 700, color: "var(--theme-text)", marginBottom: "1.5rem" }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", fontWeight: 700, color: "var(--theme-text)", marginBottom: "1.5rem" }}>
               Mengapa kolaborasi dengan IRDIVE?
             </h3>
             <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "1rem" }}>
               {[
-                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>, text: "Eksekusi cepat — dari brief ke live dalam hitungan minggu" },
-                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>, text: "Kode bersih dan terdokumentasi — gampang di-handover" },
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>, text: "Eksekusi cepat, dari brief ke live dalam hitungan minggu" },
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>, text: "Kode bersih dan terdokumentasi sehingga mudah di-handover" },
                 { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>, text: "Referral program tersedia untuk agen dan konsultan" },
                 { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>, text: "Respons WhatsApp dalam hitungan jam, bukan hari" },
               ].map((item) => (
@@ -203,7 +202,7 @@ export default function PartnershipsSection() {
           transition={{ duration: 0.5, delay: 0.4, ease: EASING }}
           style={{ textAlign: "center", fontSize: "0.8rem", color: "#9CA3AF" }}
         >
-          Technology stack di atas adalah tools yang kami gunakan secara aktif — bukan sponsor berbayar.
+          Technology stack di atas adalah tools yang kami gunakan secara aktif, bukan sponsor berbayar.
         </motion.p>
       </div>
 

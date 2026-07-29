@@ -2,13 +2,10 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { Bricolage_Grotesque } from 'next/font/google';
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import SectionBg from "@/components/ui/SectionBg";
 import Image from "next/image";
 import { CONTACT_INFO } from "@/lib/content";
-
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], weight: ["700", "800"] });
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -65,7 +62,7 @@ export default function ContactSection() {
       id="contact"
       style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
     >
-      <SectionBg variant="mascot-left" mascotSrc="/mascot-2.png" mascotOpacity={0.04} />
+      <SectionBg variant="mascot-left" mascotSrc="/mascot-2.png" mascotOpacity={0.04} dark={true} />
       <div className="container">
         {/* Header */}
         <motion.div
@@ -78,7 +75,7 @@ export default function ContactSection() {
           <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
             Hubungi Kami
           </span>
-          <h2 className={bricolage.className} style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 520 }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 520 }}>
             Mari kita mulai<br />
             <span style={{ color: "var(--theme-accent)" }}>project</span> kamu.
           </h2>
@@ -269,7 +266,7 @@ export default function ContactSection() {
                   maxWidth: 240,
                 }}
               >
-                &ldquo;Ceritain dulu aja — kami bantu pilihkan solusi yang paling pas buat kamu!&rdquo;
+                &ldquo;Ceritain dulu aja, kami bantu pilihkan solusi yang paling pas buat kamu!&rdquo;
               </div>
             </div>
 
@@ -285,7 +282,7 @@ export default function ContactSection() {
                 gap: "1rem",
               }}
             >
-              <h3 className={bricolage.className} style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--theme-text)" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", fontWeight: 700, color: "var(--theme-text)", marginBottom: "0.5rem" }}>
                 Cara lain menghubungi kami
               </h3>
 

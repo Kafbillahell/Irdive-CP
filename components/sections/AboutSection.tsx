@@ -2,12 +2,9 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ABOUT } from "@/lib/content";
 import SectionBg from "@/components/ui/SectionBg";
-
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -65,10 +62,10 @@ export default function AboutSection() {
               <span className="label-tag" style={{ display: "block", marginBottom: "1.25rem", color: "var(--theme-accent)" }}>
                 Tentang IRDIVE
               </span>
-              <h2 className={spaceGrotesk.className} style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 480 }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 480 }}>
                 Bukan sekadar<br />
-                <span style={{ color: "var(--theme-accent)" }}>vendor</span> —<br />
-                mitra digital.
+                <span style={{ color: "var(--theme-accent)" }}>vendor</span><br />
+                Mitra digital
               </h2>
             </RevealBlock>
           </div>
@@ -82,7 +79,7 @@ export default function AboutSection() {
                 maxWidth: 520,
               }}
             >
-              <p style={{ fontSize: "1.2rem", color: "#4B5563", lineHeight: 1.65, fontStyle: "italic" }}>
+              <p style={{ fontSize: "1.2rem", color: "#4B5563", lineHeight: 1.65 }}>
                 &ldquo;{ABOUT.tagline}&rdquo;
               </p>
             </blockquote>
@@ -141,7 +138,7 @@ export default function AboutSection() {
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 </span>
-                <span className={spaceGrotesk.className} style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 700, color: "var(--theme-text)" }}>Visi</span>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 700, color: "var(--theme-text)" }}>Visi</span>
               </div>
               <p style={{ fontSize: "clamp(0.8rem, 2.5vw, 1rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.6 }}>{ABOUT.vision}</p>
             </div>
@@ -174,7 +171,7 @@ export default function AboutSection() {
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 </span>
-                <span className={spaceGrotesk.className} style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 700, color: "var(--theme-text)" }}>Misi</span>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 700, color: "var(--theme-text)" }}>Misi</span>
               </div>
               <p style={{ fontSize: "clamp(0.8rem, 2.5vw, 1rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.6 }}>{ABOUT.mission}</p>
             </div>
@@ -216,7 +213,7 @@ export default function AboutSection() {
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </span>
                 <div>
-                  <h3 className={spaceGrotesk.className} style={{ fontWeight: 700, fontSize: "clamp(0.9rem, 2.5vw, 1.05rem)", color: "var(--theme-text)", marginBottom: "0.375rem" }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "clamp(0.9rem, 2.5vw, 1.05rem)", color: "var(--theme-text)", marginBottom: "0.375rem" }}>
                     {val.title}
                   </h3>
                   <p style={{ color: "var(--theme-text)", opacity: 0.7, fontSize: "clamp(0.75rem, 2vw, 0.95rem)", lineHeight: 1.5 }}>{val.desc}</p>
