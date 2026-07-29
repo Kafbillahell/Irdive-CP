@@ -238,12 +238,16 @@ export default function PortfolioSection() {
   const sectionRef    = useRef<HTMLElement | null>(null);
   const headerInView  = useInView(headerRef, { once: true, margin: "-80px" });
   const shouldReduce  = useReducedMotion();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const initialIndex = Math.floor(PORTFOLIO_ITEMS.length / 2);
+  const [activeIndex, setActiveIndex] = useState(initialIndex);
   const rafRef = useRef<number | null>(null);
+  const pointerDownPos = useRef<Record<number, { x: number; y: number }>>({});
   const smoothCenter = useRef<number | null>(null);
   const lastZIndexes = useRef<Map<HTMLElement, number>>(new Map());
   const candidateIndex = useRef<number | null>(null);
   const stableFrames = useRef<number>(0);
+  const sliderPointer = useRef<{ active: boolean; id?: number; startX?: number; startY?: number }>({ active: false });
+  const suppressAutoDetectUntil = useRef<number>(0);
 
   const carouselItems = [
     { ...PORTFOLIO_ITEMS[PORTFOLIO_ITEMS.length - 1], clone: true, realIndex: PORTFOLIO_ITEMS.length - 1 },
@@ -252,9 +256,32 @@ export default function PortfolioSection() {
   ];
 
   const scrollToIndex = (realIndex: number) => {
-    const target = sliderRef.current?.querySelector<HTMLElement>(`[data-idx='${realIndex}']`);
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    const slider = sliderRef.current;
+    const target = slider?.querySelector<HTMLElement>(`[data-idx='${realIndex}']`);
+    if (!slider || !target) return;
+    const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
+    slider.scrollTo({ left, behavior: "smooth" });
+  };
+
+  const goToIndex = (index: number) => {
+    const slider = sliderRef.current;
+    if (!slider) {
+      setActiveIndex(index);
+      return;
+    }
+    // suppress auto detection for a short moment to avoid conflicts
+    suppressAutoDetectUntil.current = Date.now() + 500;
+    setActiveIndex(index);
+    // programmatic scroll
+    scrollToIndex(index);
+    // sync smoothCenter to avoid RAF detecting a different center
+    const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
+    if (target) {
+      const center = target.offsetLeft + target.offsetWidth / 2;
+      smoothCenter.current = slider.scrollLeft + (center - (slider.scrollLeft + slider.clientWidth / 2));
+    }
+    candidateIndex.current = index;
+    stableFrames.current = 0;
   };
 
   // Smooth animation loop (requestAnimationFrame) to avoid jitter from scroll events
@@ -300,6 +327,11 @@ export default function PortfolioSection() {
       });
 
       // auto-detect closest real card; require stability across frames to avoid flicker
+      // but skip while programmatic scroll just happened
+      if (Date.now() < suppressAutoDetectUntil.current) {
+        rafRef.current = requestAnimationFrame(run);
+        return;
+      }
       if (realCenters.length > 0) {
         let minIdx = 0;
         let minDist = Math.abs(realCenters[0] - center);
@@ -341,10 +373,7 @@ export default function PortfolioSection() {
 
   // no bubble indicator measuring — active index will be detected automatically in RAF loop
 
-  useEffect(() => {
-    if (shouldReduce || PORTFOLIO_ITEMS.length <= 1) return;
-    scrollToIndex(activeIndex);
-  }, [activeIndex, shouldReduce]);
+  // removed auto-centering effect to avoid recursion; initial centering handled on mount
 
   // Update accent color smoothly when active index changes
   useEffect(() => {
@@ -356,16 +385,9 @@ export default function PortfolioSection() {
 
   useEffect(() => {
     if (!sliderRef.current || PORTFOLIO_ITEMS.length <= 1) return;
-
-    const cards = sliderRef.current.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]');
-    const firstCard = cards[0];
-    if (!firstCard) return;
-
-    const sliderRect = sliderRef.current.getBoundingClientRect();
-    const cardRect = firstCard.getBoundingClientRect();
-    sliderRef.current.scrollLeft = firstCard.offsetLeft - sliderRect.width / 2 + cardRect.width / 2;
-    // trigger a scroll event to apply initial 3D transforms (use timeout to ensure layout settled)
-    setTimeout(() => sliderRef.current?.dispatchEvent(new Event('scroll')), 50);
+    // center start at initial active index
+    // slight timeout to allow layout to settle
+    setTimeout(() => goToIndex(activeIndex), 80);
   }, []);
 
   return (
@@ -416,23 +438,47 @@ export default function PortfolioSection() {
             maxWidth: 1200,
           }}>
             {/* 3D Carousel Track */}
-            <div 
+            <div
               ref={sliderRef}
               className="hide-scroll"
               style={{
                 display: "flex",
                 gap: "1.5rem",
                 padding: "2rem 5vw 4rem 5vw",
-                overflowX: "auto",
+                overflowX: "hidden",
                 scrollSnapType: "x mandatory",
                 WebkitOverflowScrolling: "touch",
                 perspective: 1400,
                 perspectiveOrigin: "50% 50%",
+                touchAction: "pan-y", // disable horizontal touch panning so only clicks change slides
               }}
               onScroll={() => {
                 // onScroll: just update position; smoothing handled in rAF loop
                 // keep this handler lightweight to avoid jank
                 return;
+              }}
+              onWheel={(e) => {
+                // prevent horizontal wheel/trackpad gestures from scrolling the carousel
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                  e.preventDefault();
+                }
+              }}
+              onPointerDown={(e) => {
+                sliderPointer.current.active = true;
+                sliderPointer.current.id = e.pointerId;
+                sliderPointer.current.startX = e.clientX;
+                sliderPointer.current.startY = e.clientY;
+                try { (e.target as Element).setPointerCapture?.(e.pointerId); } catch {}
+              }}
+              onPointerMove={(e) => {
+                if (!sliderPointer.current.active) return;
+                // prevent native panning/scrolling while pointer is down
+                e.preventDefault();
+              }}
+              onPointerUp={(e) => {
+                if (!sliderPointer.current.active) return;
+                sliderPointer.current.active = false;
+                try { (e.target as Element).releasePointerCapture?.(e.pointerId); } catch {}
               }}
             >
               {carouselItems.map((item, i) => {
@@ -444,7 +490,34 @@ export default function PortfolioSection() {
                     key={`${item.id}-${i}`}
                     className="pf-card-wrapper"
                     data-idx={isClone ? undefined : item.realIndex}
-                    onClick={() => !isClone && setActiveIndex(item.realIndex)}
+                    role={isClone ? undefined : "button"}
+                    tabIndex={isClone ? -1 : 0}
+                    onKeyDown={(e) => {
+                      if (isClone) return;
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        goToIndex(item.realIndex);
+                      }
+                    }}
+                    onPointerDown={(e) => {
+                      if (isClone) return;
+                      pointerDownPos.current[item.realIndex] = { x: e.clientX, y: e.clientY };
+                    }}
+                    onPointerUp={(e) => {
+                      if (isClone) return;
+                      const start = pointerDownPos.current[item.realIndex];
+                      delete pointerDownPos.current[item.realIndex];
+                      if (!start) {
+                        goToIndex(item.realIndex);
+                        return;
+                      }
+                      const dx = Math.abs(e.clientX - start.x);
+                      const dy = Math.abs(e.clientY - start.y);
+                      // treat as click only when pointer movement is minimal
+                      if (dx < 8 && dy < 8) {
+                        goToIndex(item.realIndex);
+                      }
+                    }}
                     style={{
                       flexShrink: 0,
                       transition: "opacity 0.35s ease, filter 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
@@ -482,7 +555,7 @@ export default function PortfolioSection() {
                     type="button"
                     aria-label={`Lihat portofolio ${item.title}`}
                     className="pf-bubble-indicator"
-                    onClick={() => setActiveIndex(i)}
+                    onClick={() => goToIndex(i)}
                     style={{
                       height: isActive ? 14 : 12,
                       width: isActive ? 14 : 12,
