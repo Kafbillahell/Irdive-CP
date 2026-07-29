@@ -266,8 +266,8 @@ export default function PortfolioSection() {
     const sliderRect = sliderRef.current.getBoundingClientRect();
     const cardRect = firstCard.getBoundingClientRect();
     sliderRef.current.scrollLeft = firstCard.offsetLeft - sliderRect.width / 2 + cardRect.width / 2;
-    // trigger a scroll event to apply initial 3D transforms
-    sliderRef.current.dispatchEvent(new Event('scroll'));
+    // trigger a scroll event to apply initial 3D transforms (use timeout to ensure layout settled)
+    setTimeout(() => sliderRef.current?.dispatchEvent(new Event('scroll')), 50);
   }, []);
 
   return (
@@ -333,40 +333,46 @@ export default function PortfolioSection() {
               onScroll={() => {
                 if (!sliderRef.current) return;
                 const slider = sliderRef.current;
-                const cards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]'));
                 const sliderRect = slider.getBoundingClientRect();
                 const center = slider.scrollLeft + sliderRect.width / 2;
+
+                // cards that are real (have data-idx) used to determine active index
+                const realCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]'));
+                const allCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper'));
 
                 let closest = activeIndex;
                 let closestDistance = Infinity;
 
-                // Compute 3D transform per card based on distance from center
-                cards.forEach((card) => {
+                // Compute transforms for all cards (including clones) to create curved room effect
+                allCards.forEach((card) => {
+                  const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                  const norm = Math.max(-1, Math.min(1, (cardCenter - center) / (sliderRect.width / 2)));
+                  const absNorm = Math.abs(norm);
+
+                  // stronger curvature: sides move forward and tilt inward, center slightly recessed and smaller
+                  const rotateY = -norm * 24; // stronger inward tilt
+                  const rotateX = Math.min(6, absNorm * 5);
+                  const translateZ = 140 * absNorm; // sides come strongly forward
+                  const scale = 0.92 + absNorm * 0.12; // center smaller (≈0.92), sides larger
+
+                  const transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
+                  const wrapperStyle = card.style as CSSStyleDeclaration & { transform?: string };
+                  wrapperStyle.transform = transform;
+                  wrapperStyle.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
+                  wrapperStyle.transformStyle = 'preserve-3d';
+                  // zIndex: sides overlay center
+                  (card.style as any).zIndex = Math.round(absNorm * 200) + 1;
+                });
+
+                // Determine closest real card for active index
+                realCards.forEach((card) => {
                   const idx = Number(card.dataset.idx);
-                  const cardRect = card.getBoundingClientRect();
                   const cardCenter = card.offsetLeft + card.offsetWidth / 2;
                   const distance = Math.abs(cardCenter - center);
                   if (distance < closestDistance) {
                     closestDistance = distance;
                     closest = idx;
                   }
-
-                  // normalized position -1 (left) .. 0 (center) .. 1 (right)
-                  const norm = Math.max(-1, Math.min(1, (cardCenter - center) / (sliderRect.width / 2)));
-
-                  const absNorm = Math.abs(norm);
-                  const rotateY = -norm * 18; // tilt towards center
-                  const rotateX = Math.min(6, absNorm * 5); // small vertical tilt
-                  const translateZ = absNorm * 80; // sides come forward, center slightly recessed
-                  const scale = 0.96 + absNorm * 0.06; // center slightly smaller, sides slightly larger
-
-                  const transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
-                  const wrapperStyle = card.style as CSSStyleDeclaration & { transform?: string };
-                  wrapperStyle.transform = transform;
-                  wrapperStyle.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
-                  wrapperStyle.transformStyle = 'preserve-3d';
-                  // zIndex depending on distance: sides should overlay center
-                  (card.style as any).zIndex = Math.round(absNorm * 100) + 1;
                 });
 
                 if (closest !== activeIndex) setActiveIndex(closest);
@@ -384,13 +390,16 @@ export default function PortfolioSection() {
                     onClick={() => !isClone && setActiveIndex(item.realIndex)}
                     style={{
                       flexShrink: 0,
-                      transition: "opacity 0.4s ease, filter 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
-                      opacity: isActive ? 1 : 0.82,
-                      filter: isActive ? "none" : "blur(1px)",
+                      transition: "opacity 0.35s ease, filter 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
+                      opacity: isClone ? 0.5 : (isActive ? 1 : 0.88),
+                      filter: isClone ? "grayscale(80%) blur(6px)" : (isActive ? "none" : "blur(1px)"),
                       zIndex: isActive ? 3 : 2,
                       scrollSnapAlign: "center",
                       cursor: isClone ? "default" : "pointer",
                       willChange: 'transform',
+                      pointerEvents: isClone ? 'none' : 'auto',
+                      // soften edges for clone fillers so they read as background
+                      boxShadow: isClone ? 'inset 0 -10px 40px rgba(0,0,0,0.45)' : undefined,
                     }}
                   >
                     <PortfolioCard item={item} index={item.realIndex} />
