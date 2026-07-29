@@ -1,7 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface IrdiveMaskotProps {
@@ -29,12 +29,12 @@ export default function IrdiveMaskot({
   const shouldReduceMotion = useReducedMotion();
   const px = sizeMap[size];
 
-  const floatVariants = {
+  const floatVariants: Variants = {
     idle: {
       y: [0, -12, 0],
       transition: {
         duration: 3,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
         repeat: Infinity,
         repeatType: "loop" as const,
       },
