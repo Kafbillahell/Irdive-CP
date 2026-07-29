@@ -60,7 +60,7 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
+      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "1rem", position: "relative", overflow: "hidden" }}
     >
       <SectionBg variant="mascot-left" mascotSrc="/mascot-2.png" mascotOpacity={0.04} dark={true} />
       <div className="container">
@@ -195,51 +195,94 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* Contact info */}
+            {/* ── Contact info (3D Dark Mode) ── */}
             <div
               style={{
-                background: "#FFFFFF",
-                border: "1px solid #E5E7EB",
-                borderRadius: 16,
-                padding: "1.5rem",
+                background: "linear-gradient(145deg, rgba(35, 35, 35, 0.8), rgba(15, 15, 15, 0.95))",
+                backdropFilter: "blur(16px)",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                borderRadius: "24px",
+                padding: "2rem",
+                boxShadow: "0 24px 48px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.5)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "1rem",
+                gap: "0.35rem", // JARAK ANTAR KOTAK DIPERkecil
               }}
             >
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", fontWeight: 700, color: "var(--theme-text)", marginBottom: "0.5rem" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", fontWeight: 700, color: "rgba(255, 255, 255, 0.85)", marginBottom: "1rem", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
                 Cara lain menghubungi kami
               </h3>
 
               {[
-                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>, label: "Email", value: CONTACT_INFO.email, href: `mailto:${CONTACT_INFO.email}` },
-                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>, label: "Instagram", value: CONTACT_INFO.instagram, href: `https://instagram.com/${CONTACT_INFO.instagram.replace("@", "")}` },
-                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.55V6.79a4.86 4.86 0 0 1-1.01-.1Z"/></svg>, label: "TikTok", value: CONTACT_INFO.tiktok, href: `https://tiktok.com/${CONTACT_INFO.tiktok.replace("@", "@")}` },
-                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>, label: "Lokasi", value: CONTACT_INFO.location, href: null },
-              ].map((item) => (
-                <div key={item.label} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                  <span style={{ flexShrink: 0, color: "var(--theme-accent)" }}>{item.icon}</span>
-                  <div>
-                    <p style={{ fontSize: "0.7rem", fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                      {item.label}
-                    </p>
-                    {item.href ? (
-                      <a
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ fontSize: "0.9rem", color: "#2196F3", fontWeight: 500, textDecoration: "none" }}
-                        onMouseEnter={(e) => ((e.target as HTMLElement).style.textDecoration = "underline")}
-                        onMouseLeave={(e) => ((e.target as HTMLElement).style.textDecoration = "none")}
-                      >
+                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>, label: "Email", value: CONTACT_INFO.email, href: `mailto:${CONTACT_INFO.email}` },
+                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>, label: "Instagram", value: CONTACT_INFO.instagram, href: `https://instagram.com/${CONTACT_INFO.instagram.replace("@", "")}` },
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.55V6.79a4.86 4.86 0 0 1-1.01-.1Z"/></svg>, label: "TikTok", value: CONTACT_INFO.tiktok, href: `https://tiktok.com/${CONTACT_INFO.tiktok.replace("@", "")}` },
+                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>, label: "Lokasi", value: CONTACT_INFO.location, href: null },
+              ].map((item) => {
+                const isLink = !!item.href;
+                const Wrapper = isLink ? "a" : "div";
+                return (
+                  <Wrapper
+                    key={item.label}
+                    href={item.href || undefined}
+                    target={isLink ? "_blank" : undefined}
+                    rel={isLink ? "noopener noreferrer" : undefined}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "1rem", textDecoration: "none",
+                      padding: "0.6rem 1rem", // PADDING ATAS BAWAH DIPERKECIL agar kotak lebih ramping
+                      borderRadius: "16px",
+                      background: "rgba(255, 255, 255, 0.03)",
+                      border: "1px solid rgba(255, 255, 255, 0.08)",
+                      boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.4)",
+                      backdropFilter: "blur(12px)",
+                      transition: "all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                      cursor: isLink ? "pointer" : "default"
+                    }}
+                    onMouseEnter={isLink ? (e) => {
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.07)";
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.18)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 8px 16px rgba(0, 0, 0, 0.5)";
+                    } : undefined}
+                    onMouseLeave={isLink ? (e) => {
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.4)";
+                    } : undefined}
+                  >
+                    {/* Box Ikon 3D Gelap */}
+                    <div style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      width: "38px", height: "38px", // UKURAN IKON DISESUAIKAN agar pas dengan padding baru
+                      borderRadius: "10px",
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)", 
+                      border: "1px solid rgba(255, 255, 255, 0.12)",
+                      color: "#10B981",
+                      boxShadow: "inset 0 1px 2px rgba(255,255,255,0.15), 0 4px 8px rgba(0,0,0,0.3)",
+                      flexShrink: 0
+                    }}>
+                      {item.icon}
+                    </div>
+
+                    {/* Label & Value */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem", overflow: "hidden" }}>
+                      <span style={{ 
+                        fontSize: "0.65rem", fontWeight: 700, color: "rgba(255, 255, 255, 0.45)", 
+                        textTransform: "uppercase", letterSpacing: "0.08em" 
+                      }}>
+                        {item.label}
+                      </span>
+                      <span style={{ 
+                        fontSize: "0.9rem", fontWeight: 500, color: isLink ? "#60A5FA" : "rgba(255,255,255,0.9)", 
+                        letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+                      }}>
                         {item.value}
-                      </a>
-                    ) : (
-                      <p style={{ fontSize: "0.9rem", color: "#4B5563", fontWeight: 500 }}>{item.value}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
+                      </span>
+                    </div>
+                  </Wrapper>
+                );
+              })}
             </div>
           </motion.div>
         </div>
