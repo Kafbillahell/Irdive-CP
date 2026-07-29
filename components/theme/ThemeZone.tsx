@@ -52,7 +52,12 @@ export default function ThemeZone({ children, bg, text, accent, border, id, clas
   }, { scope: container });
 
   return (
-    <div ref={container} id={id} className={className} style={{ position: 'relative' }}>
+    <div 
+      ref={container}
+      id={id} 
+      className={className} 
+      style={{ position: 'relative' }}
+    >
       {children}
     </div>
   );

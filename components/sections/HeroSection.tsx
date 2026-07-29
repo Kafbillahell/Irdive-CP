@@ -67,12 +67,8 @@ function HeroParallaxMascot({ shouldReduceMotion }: { shouldReduceMotion: boolea
       const yTo = gsap.quickTo(mascotInner.current, "y", { duration: 0.6, ease: "power3.out" });
 
       const handleMove = (e: MouseEvent) => {
-        const rect = container.current?.getBoundingClientRect();
-        if(!rect) return;
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dx = (e.clientX - centerX) / window.innerWidth;
-        const dy = (e.clientY - centerY) / window.innerHeight;
+        const dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        const dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
         xTo(dx * 45); 
         yTo(dy * 45);
       };
@@ -255,7 +251,7 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          <HeroParallaxMascot shouldReduceMotion={shouldReduceMotion} />
+          <HeroParallaxMascot shouldReduceMotion={!!shouldReduceMotion} />
         </div>
       </div>
 

@@ -18,7 +18,7 @@
   --green-dark: #03663C;
   --green-light: #E8F5E9;
 
-  /* Scroll Theme Zones */
+  /* Scroll Theme Zones Globals (Safe fallbacks) */
   --theme-bg: #FAFAFA;
   --theme-text: #0B0F19;
   --theme-accent: #254EDB;
