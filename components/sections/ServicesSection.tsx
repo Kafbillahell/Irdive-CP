@@ -120,8 +120,6 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         background: "transparent",
         border: "1px solid var(--theme-border)",
         borderRadius: service.featured ? 20 : 16,
-        padding: service.featured ? "2.5rem" : "1.75rem",
-        gridColumn: service.featured ? "span 2" : "span 1",
         position: "relative",
         overflow: "hidden",
         cursor: "default",
@@ -137,6 +135,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         el.style.borderColor = "var(--theme-border)";
         el.style.transform = "translateY(0)";
       }}
+      className={service.featured ? "service-featured service-card" : "service-card"}
     >
       {/* Magnetic Glow Tracker */}
       <div 
@@ -178,11 +177,11 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
             background: "rgba(255,255,255,0.1)",
             color: "var(--theme-text)",
             border: "1px solid var(--theme-border)",
-            fontSize: "0.7rem",
+            fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)",
             fontWeight: 700,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            padding: "3px 10px",
+            padding: "2px 6px",
             borderRadius: 20,
             zIndex: 1
           }}
@@ -195,8 +194,6 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       <div
         className="svc-icon"
         style={{
-          width: 52,
-          height: 52,
           borderRadius: 14,
           background: "rgba(255,255,255,0.05)",
           color: "var(--theme-text)",
@@ -204,7 +201,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: "1.25rem",
+          marginBottom: "0.75rem",
           transition: "background 0.2s, color 0.2s, transform 0.2s",
           position: "relative", zIndex: 1
         }}
@@ -213,19 +210,20 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       </div>
 
       <h3
+        className="svc-title"
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: service.featured ? "1.35rem" : "1.05rem",
           fontWeight: 700,
           color: "var(--theme-text)",
-          marginBottom: "0.625rem",
+          marginBottom: "0.4rem",
           letterSpacing: "-0.02em",
-          position: "relative", zIndex: 1
+          position: "relative", zIndex: 1,
+          lineHeight: 1.2
         }}
       >
         {service.title}
       </h3>
-      <p style={{ fontSize: "0.9rem", color: "var(--theme-text)", opacity: 0.7, lineHeight: 1.65, position: "relative", zIndex: 1 }}>{service.desc}</p>
+      <p className="svc-desc" style={{ color: "var(--theme-text)", opacity: 0.7, lineHeight: 1.4, position: "relative", zIndex: 1 }}>{service.desc}</p>
     </motion.div>
   );
 }
@@ -275,9 +273,24 @@ export default function ServicesSection() {
       </div>
 
       <style>{`
+        .services-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 0.5rem !important;
+        }
+        .service-card { padding: 0.65rem !important; }
+        .svc-icon { width: 28px !important; height: 28px !important; svg { width: 18px; height: 18px; } }
+        .svc-title { font-size: clamp(0.85rem, 2vw, 1.15rem); }
+        .svc-desc { font-size: clamp(0.7rem, 1.8vw, 0.9rem); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
         @media (min-width: 768px) {
-          .services-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
+          .services-grid { gap: 1.25rem !important; }
+          .service-card { padding: 1.75rem !important; }
+          .svc-icon { width: 52px !important; height: 52px !important; svg { width: 28px; height: 28px; } }
+          .svc-title { font-size: 1.35rem !important; }
+          .svc-desc { font-size: 0.95rem !important; display: block; }
+          .service-featured {
+            grid-column: span 2;
+            padding: 2.5rem !important;
           }
         }
         @media (min-width: 1024px) {

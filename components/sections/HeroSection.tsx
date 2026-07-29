@@ -50,7 +50,7 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
       <div className={spaceGrotesk.className} style={{ fontSize: "2rem", fontWeight: 700, color: "var(--theme-text)", lineHeight: 1, letterSpacing: "-0.04em" }}>
         {count}{suffix}
       </div>
-      <div style={{ fontSize: "0.8rem", color: "var(--theme-text)", opacity: 0.6, marginTop: 4, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: "clamp(0.6rem, 2vw, 0.8rem)", color: "var(--theme-text)", opacity: 0.6, marginTop: 4, fontWeight: 500 }}>{label}</div>
     </div>
   );
 }
@@ -97,19 +97,22 @@ function HeroParallaxMascot({ shouldReduceMotion }: { shouldReduceMotion: boolea
       transition={{ duration: 0.9, delay: 0, ease: [0.22, 1, 0.36, 1] }}
       style={{ display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}
     >
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          width: 280,
-          height: 280,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, var(--theme-border) 0%, transparent 70%)",
-          zIndex: 0,
-        }}
-      />
-      <div ref={mascotInner} style={{ position: "relative", zIndex: 1 }}>
-        <IrdiveMaskot size="xl" preload />
+      <div className="hero-mascot-col">
+        <div
+          className="mascot-backdrop"
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, var(--theme-border) 0%, transparent 70%)",
+            zIndex: 0,
+            top: 0,
+            left: 0,
+          }}
+        />
+        <div ref={mascotInner} className="mascot-inner" style={{ position: "relative", zIndex: 1 }}>
+          <IrdiveMaskot size="xl" preload />
+        </div>
       </div>
     </motion.div>
   );
@@ -128,12 +131,11 @@ export default function HeroSection() {
 
   return (
     <section
-      id="home"
+      id="hero"
+      className="hero-section"
       style={{
         background: "transparent",
         color: "var(--theme-text)",
-        paddingTop: "calc(64px + 5rem)",
-        paddingBottom: "4rem",
         overflow: "hidden",
         position: "relative",
         minHeight: "100svh",
@@ -209,7 +211,7 @@ export default function HeroSection() {
                   key={i}
                   {...fadeUp(0.15 + i * 0.08)}
                   className={spaceGrotesk.className}
-                  style={{ display: "block", fontSize: "clamp(2.75rem, 6vw, 5rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
+                  style={{ display: "block", fontSize: "clamp(1.5rem, 6vw, 5rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
                 >
                   {line}
                 </motion.span>
@@ -219,17 +221,17 @@ export default function HeroSection() {
             {/* Subheadline */}
             <motion.p
               {...fadeUp(0.3)}
-              style={{ fontSize: "1.125rem", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.7, marginBottom: "2.5rem", maxWidth: 520 }}
+              style={{ fontSize: "clamp(0.85rem, 3vw, 1.125rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.6, marginBottom: "2rem", maxWidth: 520 }}
             >
               {HERO.subheadline}
             </motion.p>
 
             {/* CTA */}
-            <motion.div {...fadeUp(0.45)} style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "3rem" }}>
-              <Button as="a" href={HERO.ctaPrimary.href} variant="primary" size="lg">
+            <motion.div {...fadeUp(0.45)} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "3rem" }}>
+              <Button as="a" href={HERO.ctaPrimary.href} variant="primary" size="lg" className="hero-btn">
                 {HERO.ctaPrimary.label} →
               </Button>
-              <Button as="a" href={HERO.ctaSecondary.href} variant="ghost" size="lg">
+              <Button as="a" href={HERO.ctaSecondary.href} variant="ghost" size="lg" className="hero-btn">
                 {HERO.ctaSecondary.label}
               </Button>
             </motion.div>
@@ -239,8 +241,8 @@ export default function HeroSection() {
               {...fadeUp(0.55)}
               style={{
                 display: "flex",
-                gap: "2.5rem",
-                paddingTop: "2rem",
+                gap: "1.25rem",
+                paddingTop: "1.25rem",
                 borderTop: "1px solid #E5E7EB",
                 flexWrap: "wrap",
               }}
@@ -256,9 +258,48 @@ export default function HeroSection() {
       </div>
 
       <style>{`
+        .hero-section {
+          padding-top: calc(64px + 2rem);
+          padding-bottom: 3rem;
+        }
+        .hero-grid {
+          grid-template-columns: 1fr !important;
+          gap: 2rem !important;
+        }
+        .hero-mascot-col {
+          position: absolute;
+          right: -2rem;
+          top: 0;
+          transform: scale(0.65);
+          transform-origin: top right;
+          pointer-events: none;
+          z-index: 0;
+          opacity: 0.8;
+        }
+        .mascot-backdrop { width: 280px; height: 280px; }
+        .hero-btn { font-size: 0.9rem !important; padding: 0.75rem 1.25rem !important; }
+        
+        @media (min-width: 640px) {
+          .hero-mascot-col { right: 0; transform: scale(0.8); }
+          .hero-btn { font-size: 1rem !important; padding: 1rem 1.75rem !important; }
+        }
         @media (min-width: 960px) {
+          .hero-section {
+            padding-top: calc(64px + 5rem);
+            padding-bottom: 5rem;
+          }
           .hero-grid {
             grid-template-columns: 55% 45% !important;
+            gap: 3rem !important;
+          }
+          .hero-mascot-col { 
+            position: relative; 
+            right: auto; top: auto; 
+            transform: scale(1);
+            pointer-events: auto;
+            opacity: 1;
+            display: flex;
+            justify-content: center;
           }
         }
       `}</style>

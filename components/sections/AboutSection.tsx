@@ -125,9 +125,8 @@ export default function AboutSection() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
                 <span
+                  className="vm-icon"
                   style={{
-                    width: 40,
-                    height: 40,
                     borderRadius: 12,
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid var(--theme-border)",
@@ -140,9 +139,9 @@ export default function AboutSection() {
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 </span>
-                <span className={spaceGrotesk.className} style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--theme-text)" }}>Visi</span>
+                <span className={spaceGrotesk.className} style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 700, color: "var(--theme-text)" }}>Visi</span>
               </div>
-              <p style={{ color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.7 }}>{ABOUT.vision}</p>
+              <p style={{ fontSize: "clamp(0.8rem, 2.5vw, 1rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.6 }}>{ABOUT.vision}</p>
             </div>
           </RevealBlock>
 
@@ -159,9 +158,8 @@ export default function AboutSection() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
                 <span
+                  className="vm-icon"
                   style={{
-                    width: 40,
-                    height: 40,
                     borderRadius: 12,
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid var(--theme-border)",
@@ -174,9 +172,9 @@ export default function AboutSection() {
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 </span>
-                <span className={spaceGrotesk.className} style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--theme-text)" }}>Misi</span>
+                <span className={spaceGrotesk.className} style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 700, color: "var(--theme-text)" }}>Misi</span>
               </div>
-              <p style={{ color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.7 }}>{ABOUT.mission}</p>
+              <p style={{ fontSize: "clamp(0.8rem, 2.5vw, 1rem)", color: "var(--theme-text)", opacity: 0.8, lineHeight: 1.6 }}>{ABOUT.mission}</p>
             </div>
           </RevealBlock>
         </div>
@@ -216,10 +214,10 @@ export default function AboutSection() {
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </span>
                 <div>
-                  <h3 className={spaceGrotesk.className} style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--theme-text)", marginBottom: "0.375rem" }}>
+                  <h3 className={spaceGrotesk.className} style={{ fontWeight: 700, fontSize: "clamp(0.9rem, 2.5vw, 1.05rem)", color: "var(--theme-text)", marginBottom: "0.375rem" }}>
                     {val.title}
                   </h3>
-                  <p style={{ color: "var(--theme-text)", opacity: 0.7, fontSize: "0.95rem", lineHeight: 1.6 }}>{val.desc}</p>
+                  <p style={{ color: "var(--theme-text)", opacity: 0.7, fontSize: "clamp(0.75rem, 2vw, 0.95rem)", lineHeight: 1.5 }}>{val.desc}</p>
                 </div>
               </div>
             </RevealBlock>
@@ -228,9 +226,18 @@ export default function AboutSection() {
       </div>
 
       <style>{`
+        .vm-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 0.5rem !important;
+        }
+        .vm-card { padding: 0.75rem !important; }
+        .vm-icon { width: 28px !important; height: 28px !important; }
+
         @media (min-width: 768px) {
+          .vm-grid { gap: 1.5rem !important; }
+          .vm-card { padding: 2rem !important; }
+          .vm-icon { width: 40px !important; height: 40px !important; }
           .about-top-grid { grid-template-columns: 1fr 1fr !important; }
-          .vm-grid { grid-template-columns: 1fr 1fr !important; }
           .values-grid { grid-template-columns: repeat(3, 1fr) !important; }
         }
       `}</style>

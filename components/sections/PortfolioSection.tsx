@@ -27,8 +27,8 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
         whileInView={shouldReduce ? {} : { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", scale: 1 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.85, delay: 0.08 * (index % 3), ease: EASING }}
+        className={isWide ? "portfolio-wide" : ""}
         style={{
-          gridColumn: isWide ? "span 2" : "span 1",
           borderRadius: 18,
           overflow: "hidden",
           cursor: "pointer",
@@ -47,9 +47,9 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
       >
         {/* Color block top */}
         <div
+          className="pf-banner"
           style={{
             background: `linear-gradient(135deg, ${item.accentColor}18 0%, ${item.accentColor}08 100%)`,
-            height: isWide ? 160 : 130,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -70,7 +70,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
           <span
             className={syne.className}
             style={{
-              fontSize: "2.8rem",
+              fontSize: "clamp(1.5rem, 5vw, 2.8rem)",
               fontWeight: 800,
               color: item.accentColor,
               opacity: 0.15,
@@ -143,24 +143,25 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
         </div>
 
         {/* Card body */}
-        <div style={{ padding: "1.25rem 1.5rem" }}>
+        <div className="pf-body">
           <h3
             className={syne.className}
             style={{
               fontWeight: 700,
-              fontSize: "1.1rem",
+              fontSize: "clamp(0.85rem, 3vw, 1.1rem)",
               color: "var(--theme-text)",
               marginBottom: "0.25rem",
+              lineHeight: 1.2
             }}
           >
             {item.title}
           </h3>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+          <div className="pf-tech">
             {item.tech.map((t) => (
               <span
                 key={t}
                 style={{
-                  fontSize: "0.7rem",
+                  fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)",
                   fontWeight: 600,
                   color: "#6B7280",
                   background: "#F3F4F6",
@@ -391,9 +392,22 @@ export default function PortfolioSection() {
       </div>
 
       <style>{`
+        .portfolio-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 0.5rem !important;
+        }
+        .pf-banner { height: 90px !important; }
+        .pf-body { padding: 0.75rem !important; }
+        .pf-tech { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        
         @media (min-width: 640px) {
-          .portfolio-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
+          .portfolio-grid { gap: 1.25rem !important; }
+          .pf-banner { height: 130px !important; }
+          .portfolio-wide .pf-banner { height: 160px !important; }
+          .pf-body { padding: 1.25rem 1.5rem !important; }
+          .pf-tech { gap: 0.5rem; }
+          .portfolio-wide {
+            grid-column: span 2;
           }
         }
         @media (min-width: 1024px) {
