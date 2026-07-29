@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -44,16 +44,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const shouldReduce = useReducedMotion();
 
-  // Placeholder images based on index, looking professional (coding, tech, abstract dark)
-  const placeholderImages = [
-    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
-  ];
-  const bgImage = placeholderImages[index % placeholderImages.length];
+  const bgImage = item.imageSrc ?? "/assets/image.png";
 
   useGSAP(() => {
     if (shouldReduce) return;
@@ -246,90 +237,36 @@ export default function PortfolioSection() {
   const sliderRef     = useRef<HTMLDivElement>(null);
   const headerInView  = useInView(headerRef, { once: true, margin: "-80px" });
   const shouldReduce  = useReducedMotion();
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  // 3D Coverflow Effect Logic
-  useGSAP(() => {
-    if (shouldReduce || !sliderRef.current) return;
-    
-    // We use a simple rAF loop to calculate the distance of each card 
-    // from the center of the viewport and apply a rotateY and scale.
-    let rafId: number;
-    const cards = sliderRef.current.querySelectorAll('.pf-card-wrapper');
-    const bubbles = document.querySelectorAll('.pf-bubble-indicator');
-    
-    const update3D = () => {
-      if (!sliderRef.current) return;
-      const sliderCenter = sliderRef.current.getBoundingClientRect().width / 2;
-      
-      let closestIdx = 0;
-      let minDistance = Infinity;
+  const carouselItems = [
+    { ...PORTFOLIO_ITEMS[PORTFOLIO_ITEMS.length - 1], clone: true, realIndex: PORTFOLIO_ITEMS.length - 1 },
+    ...PORTFOLIO_ITEMS.map((item, index) => ({ ...item, clone: false, realIndex: index })),
+    { ...PORTFOLIO_ITEMS[0], clone: true, realIndex: 0 },
+  ];
 
-      cards.forEach((cardEl, idx) => {
-        const el = cardEl as HTMLElement;
-        const rect = el.getBoundingClientRect();
-        // Calculate center of this specific card relative to the viewport
-        const cardCenter = rect.left + rect.width / 2;
-        
-        // Distance from center of window
-        const windowCenter = window.innerWidth / 2;
-        const dist = cardCenter - windowCenter;
-        
-        const absDistForActive = Math.abs(dist);
-        if (absDistForActive < minDistance) {
-          minDistance = absDistForActive;
-          closestIdx = idx;
-        }
+  const scrollToIndex = (realIndex: number) => {
+    const target = sliderRef.current?.querySelector<HTMLElement>(`[data-idx='${realIndex}']`);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  };
 
-        // Max rotation angle
-        const maxRotate = 22; 
-        
-        // Map distance to rotation (-max to +max)
-        let rotateY = (dist / window.innerWidth) * maxRotate * 2.8; 
-        
-        // Clamp rotation
-        if (rotateY > maxRotate) rotateY = maxRotate;
-        if (rotateY < -maxRotate) rotateY = -maxRotate;
-        
-        // Scale down slightly as it moves away from center, adding depth
-        const absDist = Math.abs(rotateY) / maxRotate;
-        const scale = 1 - (absDist * 0.1);
-        const z = -absDist * 50; // Push back in Z space
-        const zIndex = Math.round((1 - absDist) * 100);
+  useEffect(() => {
+    if (shouldReduce || PORTFOLIO_ITEMS.length <= 1) return;
+    scrollToIndex(activeIndex);
+  }, [activeIndex, shouldReduce]);
 
-        // Enhance 3D effect with Z translation
-        el.style.transform = `perspective(1200px) translateZ(${z}px) rotateY(${rotateY}deg) scale(${scale})`;
-        el.style.zIndex = zIndex.toString();
-        // Add dynamic box-shadow based on tilt for elegant lighting
-        const shadowOffset = rotateY * -1; // opposite to tilt
-        el.style.filter = `drop-shadow(${shadowOffset}px 20px 30px rgba(0,0,0,${0.05 + (absDist * 0.1)}))`;
-      });
+  useEffect(() => {
+    if (!sliderRef.current || PORTFOLIO_ITEMS.length <= 1) return;
 
-      // Update bubbles
-      bubbles.forEach((bubble, idx) => {
-        const b = bubble as HTMLElement;
-        if (idx === closestIdx) {
-          b.style.transform = "scale(1.5) translateY(-4px)";
-          b.style.background = "var(--theme-accent)"; // Active gets the primary brand color
-          b.style.boxShadow = "0 6px 12px rgba(33, 150, 243, 0.3), inset 0 -2px 6px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.6)";
-          b.style.borderColor = "rgba(0,0,0,0.1)";
-          b.style.opacity = "1";
-        } else {
-          // Add a subtle wave float based on distance
-          const floatOffset = Math.abs(idx - closestIdx) * 1.5;
-          b.style.transform = `scale(1) translateY(${floatOffset}px)`;
-          b.style.background = "rgba(0, 0, 0, 0.06)"; // Darker tint for light backgrounds
-          b.style.boxShadow = "inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.05), 0 2px 5px rgba(0,0,0,0.05)";
-          b.style.borderColor = "rgba(0,0,0,0.08)";
-          b.style.opacity = "0.7";
-        }
-      });
+    const cards = sliderRef.current.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]');
+    const firstCard = cards[0];
+    if (!firstCard) return;
 
-      rafId = requestAnimationFrame(update3D);
-    };
-    rafId = requestAnimationFrame(update3D);
-
-    return () => cancelAnimationFrame(rafId);
-  }, { scope: sliderRef });
+    const sliderRect = sliderRef.current.getBoundingClientRect();
+    const cardRect = firstCard.getBoundingClientRect();
+    sliderRef.current.scrollLeft = firstCard.offsetLeft - sliderRect.width / 2 + cardRect.width / 2;
+  }, []);
 
   return (
     <section
@@ -384,17 +321,53 @@ export default function PortfolioSection() {
               style={{
                 display: "flex",
                 gap: "1.5rem",
-                padding: "2rem 5vw 4rem 5vw", // Padding ensures 3D cards aren't clipped
+                padding: "2rem 5vw 4rem 5vw",
                 overflowX: "auto",
                 scrollSnapType: "x mandatory",
                 WebkitOverflowScrolling: "touch",
               }}
+              onScroll={() => {
+                if (!sliderRef.current) return;
+                const cards = Array.from(sliderRef.current.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]'));
+                const center = sliderRef.current.scrollLeft + sliderRef.current.getBoundingClientRect().width / 2;
+                let closest = activeIndex;
+                let closestDistance = Infinity;
+                cards.forEach((card) => {
+                  const idx = Number(card.dataset.idx);
+                  const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                  const distance = Math.abs(cardCenter - center);
+                  if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closest = idx;
+                  }
+                });
+                if (closest !== activeIndex) setActiveIndex(closest);
+              }}
             >
-              {PORTFOLIO_ITEMS.map((item, i) => (
-                <div key={item.id} className="pf-card-wrapper" style={{ flexShrink: 0, transition: "transform 0.1s cubic-bezier(0.2,0.8,0.2,1)" }}>
-                  <PortfolioCard item={item} index={i} />
-                </div>
-              ))}
+              {carouselItems.map((item, i) => {
+                const isClone = item.clone;
+                const isActive = item.realIndex === activeIndex && !isClone;
+
+                return (
+                  <div
+                    key={`${item.id}-${i}`}
+                    className="pf-card-wrapper"
+                    data-idx={isClone ? undefined : item.realIndex}
+                    onClick={() => !isClone && setActiveIndex(item.realIndex)}
+                    style={{
+                      flexShrink: 0,
+                      transition: "opacity 0.4s ease, filter 0.4s ease",
+                      opacity: isActive ? 1 : 0.82,
+                      filter: isActive ? "none" : "blur(1px)",
+                      zIndex: isActive ? 3 : 2,
+                      scrollSnapAlign: "center",
+                      cursor: isClone ? "default" : "pointer",
+                    }}
+                  >
+                    <PortfolioCard item={item} index={item.realIndex} />
+                  </div>
+                );
+              })}
             </div>
 
             {/* 3D Floating Bubble Pagination Indicators */}
@@ -402,27 +375,37 @@ export default function PortfolioSection() {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              gap: "12px", // a bit more space for floating bubbles
-              marginTop: "-1rem", /* Pull up closer to cards */
+              gap: "12px",
+              marginTop: "-1rem",
               paddingBottom: "3rem"
             }}>
-              {PORTFOLIO_ITEMS.map((item, i) => (
-                <div 
-                  key={`bubble-${item.id}`} 
-                  className="pf-bubble-indicator"
-                  style={{
-                    height: 12,
-                    width: 12,
-                    borderRadius: "50%",
-                    background: "rgba(0,0,0,0.06)",
-                    backdropFilter: "blur(4px)",
-                    boxShadow: "inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.05), 0 2px 5px rgba(0,0,0,0.05)",
-                    border: "1px solid rgba(0,0,0,0.08)",
-                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s, box-shadow 0.4s",
-                    animation: `float-bubble 3s ease-in-out infinite alternate ${i * 0.2}s`
-                  }}
-                />
-              ))}
+              {PORTFOLIO_ITEMS.map((item, i) => {
+                const isActive = i === activeIndex;
+                return (
+                  <button
+                    key={`bubble-${item.id}`}
+                    type="button"
+                    aria-label={`Lihat portofolio ${item.title}`}
+                    className="pf-bubble-indicator"
+                    onClick={() => setActiveIndex(i)}
+                    style={{
+                      height: isActive ? 14 : 12,
+                      width: isActive ? 14 : 12,
+                      borderRadius: "50%",
+                      background: isActive ? "var(--theme-accent)" : "rgba(0,0,0,0.06)",
+                      backdropFilter: "blur(4px)",
+                      boxShadow: isActive
+                        ? "0 6px 12px rgba(33, 150, 243, 0.25), inset 0 -2px 6px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,0.7)"
+                        : "inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.05), 0 2px 5px rgba(0,0,0,0.05)",
+                      border: "1px solid rgba(0,0,0,0.08)",
+                      transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s, box-shadow 0.4s, width 0.3s, height 0.3s",
+                      transform: isActive ? "scale(1.35)" : "scale(1)",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>

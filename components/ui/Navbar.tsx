@@ -42,6 +42,10 @@ export default function Navbar() {
 
   const handleNavClick = (href: string) => {
     setMobileOpen(false);
+    if (href === "#home") {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      return;
+    }
     const id = href.replace("#", "");
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });

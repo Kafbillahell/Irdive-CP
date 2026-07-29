@@ -117,74 +117,45 @@ export interface PortfolioItem {
   tech: string[];
   span?: "wide" | "tall" | "normal";
   accentColor: string;
+  imageSrc?: string;
 }
 
 export const PORTFOLIO_ITEMS: PortfolioItem[] = [
   {
     id: "p1",
-    title: "Toko Nusantara",
+    title: "Zans Café",
     category: "featured",
-    categoryLabel: "E-Commerce Platform",
+    categoryLabel: "Brand & Experience",
     description:
-      "Platform toko online lengkap dengan manajemen produk, pembayaran terintegrasi, dan laporan penjualan real-time.",
-    tech: ["Next.js", "PostgreSQL", "Stripe"],
+      "Visual brand café yang menonjolkan suasana hangat, menu khas, dan pengalaman kuliner yang memorable untuk pengunjung.",
+    tech: ["Branding", "UI Design", "Visual Story"],
     span: "wide",
     accentColor: "#1E2328",
+    imageSrc: "/card-portfolio/zans%20cafe%20card.png",
   },
   {
     id: "p2",
-    title: "Klinik Sehat",
-    category: "website",
-    categoryLabel: "Company Profile",
+    title: "SISAB",
+    category: "system",
+    categoryLabel: "School Information System",
     description:
-      "Website klinik kesehatan modern dengan sistem booking appointment yang bisa diakses langsung dari halaman utama.",
-    tech: ["Next.js", "Tailwind", "Sanity"],
+      "Sistem informasi sekolah yang memudahkan pengelolaan data siswa, absensi, dan jadwal dengan tampilan yang rapi dan mudah dipakai.",
+    tech: ["Dashboard", "Data Management", "Web App"],
     span: "normal",
     accentColor: "#1E2328",
+    imageSrc: "/card-portfolio/sisab%20card.png",
   },
   {
     id: "p3",
-    title: "FinTrack Pro",
-    category: "system",
-    categoryLabel: "Business System",
-    description:
-      "Sistem manajemen keuangan internal untuk perusahaan distribusi. Laporan otomatis dan mudah dibaca.",
-    tech: ["React", "Node.js", "MySQL"],
-    span: "normal",
-    accentColor: "#1E2328",
-  },
-  {
-    id: "p4",
-    title: "Summit Academy",
-    category: "landing",
-    categoryLabel: "Landing Page",
-    description:
-      "Landing page kursus online yang dioptimasi untuk konversi, dilengkapi pengujian A/B untuk terus ditingkatkan.",
-    tech: ["Next.js", "Framer Motion"],
-    span: "wide",
-    accentColor: "#1E2328",
-  },
-  {
-    id: "p5",
-    title: "Logistix Dashboard",
-    category: "system",
-    categoryLabel: "Business System",
-    description:
-      "Dashboard pemantauan logistik dengan pelacakan posisi armada secara real-time.",
-    tech: ["React", "TypeScript", "Mapbox"],
-    span: "normal",
-    accentColor: "#1E2328",
-  },
-  {
-    id: "p6",
-    title: "Rasa Kuliner",
+    title: "Uang Kas",
     category: "website",
-    categoryLabel: "Restaurant Profile",
+    categoryLabel: "Cash Management",
     description:
-      "Website restoran dengan menu digital interaktif, galeri foto, dan fitur reservasi meja online.",
-    tech: ["Next.js", "Contentful"],
+      "Aplikasi pencatatan kas sederhana yang membantu memantau transaksi, saldo, dan laporan bulanan dengan lebih teratur.",
+    tech: ["Finance UI", "Reporting", "Simple Workflow"],
     span: "normal",
     accentColor: "#1E2328",
+    imageSrc: "/card-portfolio/uang%20kas%20card.png",
   },
 ];
 
