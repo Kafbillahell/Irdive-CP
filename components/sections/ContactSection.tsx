@@ -116,128 +116,53 @@ export default function ContactSection() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }} className="form-2col">
-                  {/* Name */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#4B5563", marginBottom: "0.4rem" }}>
-                      Nama *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      placeholder="Nama kamu"
-                      value={form.name}
-                      onChange={handleChange}
-                      style={inputStyle}
-                      onFocus={(e) => { e.target.style.borderColor = "#2196F3"; e.target.style.boxShadow = "0 0 0 3px rgba(33,150,243,0.1)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#4B5563", marginBottom: "0.4rem" }}>
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      placeholder="email@kamu.com"
-                      value={form.email}
-                      onChange={handleChange}
-                      style={inputStyle}
-                      onFocus={(e) => { e.target.style.borderColor = "#2196F3"; e.target.style.boxShadow = "0 0 0 3px rgba(33,150,243,0.1)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
-                    />
-                  </div>
+              <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: "2rem", background: "#FFFFFF", borderRadius: 16, border: "1px solid #E5E7EB", textAlign: "center", alignItems: "center", overflow: "hidden", minHeight: 380, justifyContent: "center" }}>
+                {/* Background Image Layer */}
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
+                  <Image src="/bg-ig.png" alt="IRDIVE Contact Background" fill style={{ objectFit: "cover", objectPosition: "center" }} />
+                  {/* Overlay for readable text */}
+                  <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.15)" }} />
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }} className="form-2col">
-                  {/* WhatsApp */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#4B5563", marginBottom: "0.4rem" }}>
-                      WhatsApp *
-                    </label>
-                    <input
-                      type="tel"
-                      name="whatsapp"
-                      required
-                      placeholder="08xxxxxxxxxx"
-                      value={form.whatsapp}
-                      onChange={handleChange}
-                      style={inputStyle}
-                      onFocus={(e) => { e.target.style.borderColor = "#2196F3"; e.target.style.boxShadow = "0 0 0 3px rgba(33,150,243,0.1)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
-                    />
-                  </div>
-
-                  {/* Company */}
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#4B5563", marginBottom: "0.4rem" }}>
-                      Perusahaan
-                    </label>
-                    <input
-                      type="text"
-                      name="company"
-                      placeholder="Nama perusahaan (opsional)"
-                      value={form.company}
-                      onChange={handleChange}
-                      style={inputStyle}
-                      onFocus={(e) => { e.target.style.borderColor = "#2196F3"; e.target.style.boxShadow = "0 0 0 3px rgba(33,150,243,0.1)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
-                    />
-                  </div>
-                </div>
-
-                {/* Needs */}
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#4B5563", marginBottom: "0.4rem" }}>
-                    Ceritakan Kebutuhan Project Kamu *
-                  </label>
-                  <textarea
-                    name="needs"
-                    required
-                    rows={5}
-                    placeholder="Contoh: Saya perlu website company profile untuk bisnis konsultan saya, preferensi warna hijau/putih, ada halaman tim dan kontak..."
-                    value={form.needs}
-                    onChange={handleChange}
-                    style={{ ...inputStyle, resize: "vertical", minHeight: 120 }}
-                    onFocus={(e) => { e.target.style.borderColor = "#2196F3"; e.target.style.boxShadow = "0 0 0 3px rgba(33,150,243,0.1)"; }}
-                    onBlur={(e) => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
-                  />
-                </div>
-
-                <motion.button
-                  type="submit"
-                  whileHover={{ scale: 1.04, y: -2, boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}
+                {/* Content Box with Glassmorphism */}
+                <div style={{ position: "relative", zIndex: 1, padding: "2rem", margin: "1.5rem", background: "rgba(255, 255, 255, 0.6)", backdropFilter: "blur(12px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 8px 32px rgba(0,0,0,0.08)" }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, color: "#1E2328", marginBottom: "0.5rem" }}>
+                    Terhubung Lewat Instagram 
+                  </h3>
+                  <p style={{ color: "#4B5563", fontSize: "0.95rem", lineHeight: 1.6, maxWidth: 360, margin: "0 auto 1.5rem" }}>
+                    Saat ini kami lebih sering dan aktif merespons pesan melalui Instagram DM. Mari diskusikan detail project-mu di sana!
+                  </p>
+                  
+                  <motion.a
+                  href="https://www.instagram.com/irdive.tech?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.04, y: -2, boxShadow: "0 8px 30px rgba(0,0,0,0.15)" }}
                   whileTap={{ scale: 0.9, y: 1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   style={{
-                    background: "var(--theme-accent)",
+                    background: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
                     color: "white",
                     fontFamily: "var(--font-body)",
                     fontWeight: 700,
                     fontSize: "1.05rem",
-                    padding: "1rem 2rem",
-                    border: "none",
+                    padding: "1rem 2.5rem",
+                    textDecoration: "none",
                     borderRadius: 12,
-                    cursor: "pointer",
-                    display: "flex",
+                    display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "0.5rem",
-                    boxShadow: "0 4px 14px rgba(0,0,0,0.25)",
+                    boxShadow: "0 4px 14px rgba(220, 39, 67, 0.3)",
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
                   </svg>
-                  Kirim via WhatsApp
-                </motion.button>
-              </form>
+                  Kirim via Instagram
+                </motion.a>
+                </div>
+              </div>
             )}
           </motion.div>
 
@@ -266,7 +191,7 @@ export default function ContactSection() {
                   maxWidth: 240,
                 }}
               >
-                &ldquo;Ceritain dulu aja, kami bantu pilihkan solusi yang paling pas buat kamu!&rdquo;
+                Ceritain dulu aja, kami bantu pilihkan solusi yang paling pas buat kamu!
               </div>
             </div>
 
@@ -288,8 +213,8 @@ export default function ContactSection() {
 
               {[
                 { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>, label: "Email", value: CONTACT_INFO.email, href: `mailto:${CONTACT_INFO.email}` },
-                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>, label: "Instagram", value: CONTACT_INFO.instagram, href: "https://instagram.com" },
-                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>, label: "LinkedIn", value: CONTACT_INFO.linkedin, href: "https://linkedin.com" },
+                { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>, label: "Instagram", value: CONTACT_INFO.instagram, href: `https://instagram.com/${CONTACT_INFO.instagram.replace("@", "")}` },
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.55V6.79a4.86 4.86 0 0 1-1.01-.1Z"/></svg>, label: "TikTok", value: CONTACT_INFO.tiktok, href: `https://tiktok.com/${CONTACT_INFO.tiktok.replace("@", "@")}` },
                 { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>, label: "Lokasi", value: CONTACT_INFO.location, href: null },
               ].map((item) => (
                 <div key={item.label} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>

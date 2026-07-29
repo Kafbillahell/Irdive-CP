@@ -18,9 +18,9 @@ export const SECTION_IDS = ["home", "about", "services", "portfolio", "contact",
 
 // ── Hero ──────────────────────────────────────────────────────
 export const HERO = {
-  headline: "Build Better\nDigital Experiences.",
+  headline: "Tampil Lebih Profesional\ndi Dunia Digital.",
   subheadline:
-    "IRDIVE membantu bisnis membangun website dan web app yang cepat, terlihat profesional, dan benar-benar berdampak pada pertumbuhan bisnis.",
+    "IRDIVE membantu bisnis Indonesia membangun website dan aplikasi web yang cepat, terlihat profesional, dan benar-benar berdampak nyata pada pertumbuhan bisnis.",
   ctaPrimary:   { label: "Konsultasi Gratis", href: "#contact" },
   ctaSecondary: { label: "Lihat Portfolio",   href: "#portfolio" },
 } as const;
@@ -48,19 +48,19 @@ export const ABOUT = {
     "Membangun produk digital yang terlihat profesional, bekerja cepat, dan memberi hasil nyata bagi bisnis klien",
   values: [
     {
-      icon: "⚡",
-      title: "Speed First",
+      icon: "speed",
+      title: "Performa Tinggi",
       desc: "Website lambat kehilangan pengunjung. Performa bukan fitur tambahan, ini hal pertama yang kami jaga.",
     },
     {
-      icon: "🎯",
+      icon: "design",
       title: "Desain Bertujuan",
-      desc: "Setiap pilihan desain ada alasannya. Cantik saja tidak cukup kalau tidak membantu bisnis kamu berkembang.",
+      desc: "Setiap pilihan desain ada alasannya. Tampil menarik saja tidak cukup kalau tidak membantu bisnis kamu berkembang.",
     },
     {
-      icon: "🤝",
+      icon: "collab",
       title: "Kolaborasi Nyata",
-      desc: "Kami ikut duduk dan memikirkan tantangan bisnis kamu, bukan sekadar mengeksekusi brief.",
+      desc: "Kami terlibat langsung memahami tantangan bisnis kamu, bukan sekadar mengeksekusi brief.",
     },
   ],
 } as const;
@@ -190,10 +190,10 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
 
 // ── Contact ───────────────────────────────────────────────────
 export const CONTACT_INFO = {
-  whatsapp: "6285xxxxxxxxx", // Replace with real number
-  email: "hello@irdive.id",
-  instagram: "@irdive.id",
-  linkedin: "IRDIVE",
+  whatsapp: "6280954677", // ganti dengan nomor lengkap jika perlu
+  email: "irdive.tech@gmail.com",
+  instagram: "@irdive.tech",
+  tiktok: "@irdive.tech",
   location: "Indonesia",
   waMessage:
     "Halo IRDIVE! Saya tertarik dengan layanan kalian dan ingin diskusi lebih lanjut soal project saya.",

@@ -80,7 +80,7 @@ export default function AboutSection() {
               }}
             >
               <p style={{ fontSize: "1.2rem", color: "#4B5563", lineHeight: 1.65 }}>
-                &ldquo;{ABOUT.tagline}&rdquo;
+                {ABOUT.tagline}
               </p>
             </blockquote>
           </RevealBlock>

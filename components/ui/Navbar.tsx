@@ -2,33 +2,33 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import IrdiveLogo from "@/components/logo-maskot/IrdiveLogo";
 import { NAV_LINKS, SECTION_IDS } from "@/lib/content";
+
+// The IRDIVE TECHNOLOGY logo PNG has significant internal transparent padding.
+// We render it larger than typical so the actual brand content appears at a good size.
+const LOGO_HEIGHT_TOP = 64;   // top bar (not scrolled)
+const LOGO_HEIGHT_PILL = 52;  // floating pill (scrolled)
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("home");
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Scroll-aware background
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Active section tracker via IntersectionObserver
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
     const sectionMap: Record<string, number> = {};
-
     SECTION_IDS.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
           sectionMap[id] = entry.intersectionRatio;
-          // Highest ratio = most visible = active
           const best = Object.entries(sectionMap).sort((a, b) => b[1] - a[1])[0];
           if (best && best[1] > 0) setActiveSection(best[0]);
         },
@@ -37,7 +37,6 @@ export default function Navbar() {
       obs.observe(el);
       observers.push(obs);
     });
-
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
@@ -48,216 +47,284 @@ export default function Navbar() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
+  const Logo = ({ height }: { height: number }) => (
+    <a
+      href="#home"
+      onClick={() => handleNavClick("#home")}
+      aria-label="IRDIVE Technology"
+      style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}
+    >
+      <span style={{
+        fontFamily: "var(--font-display)",
+        fontWeight: 800,
+        fontSize: height * 0.32,
+        letterSpacing: "0.05em",
+        color: "#1E2328",
+        padding: "0.4rem 1.2rem",
+        borderRadius: "99px",
+        background: "rgba(255, 255, 255, 0.05)",
+        backdropFilter: "blur(48px) saturate(1.7)",
+        WebkitBackdropFilter: "blur(48px) saturate(1.7)",
+        border: "1px solid rgba(255, 255, 255, 0.35)",
+        boxShadow: "inset 0 1px 1px rgba(255,255,255,0.4), 0 4px 12px rgba(0,0,0,0.05)",
+      }}>
+        IRDIVE
+      </span>
+    </a>
+  );
+
+  const NavLinks = ({ layoutId }: { layoutId: string }) => (
+    <>
+      {NAV_LINKS.map((link) => {
+        const isActive = activeSection === link.href.replace("#", "");
+        return (
+          <button
+            key={link.href}
+            onClick={() => handleNavClick(link.href)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontFamily: "var(--font-body)",
+              fontSize: "0.875rem",
+              fontWeight: isActive ? 600 : 400,
+              color: isActive ? "#2196F3" : "#374151",
+              padding: "4px 0",
+              position: "relative",
+              letterSpacing: "0.005em",
+              transition: "color 0.2s",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {link.label}
+            {isActive && (
+              <motion.span
+                layoutId={layoutId}
+                style={{
+                  position: "absolute", bottom: -3, left: 0, right: 0,
+                  height: 2,
+                  background: "linear-gradient(90deg,#2196F3,#4CAF50)",
+                  borderRadius: 2,
+                }}
+                transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              />
+            )}
+          </button>
+        );
+      })}
+    </>
+  );
+
+  const CtaButton = () => (
+    <a
+      href="https://www.instagram.com/irdive.tech?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        background: "linear-gradient(135deg,#2196F3,#1976D2)",
+        color: "white", fontFamily: "var(--font-body)", fontWeight: 600,
+        fontSize: "0.875rem", padding: "0.5rem 1.25rem", borderRadius: 10,
+        textDecoration: "none", whiteSpace: "nowrap",
+        boxShadow: "0 2px 10px rgba(33,150,243,0.28)",
+        transition: "transform 0.18s, box-shadow 0.18s",
+        display: "inline-flex", alignItems: "center",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 18px rgba(33,150,243,0.42)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 10px rgba(33,150,243,0.28)";
+      }}
+    >
+      Hubungi Kami
+    </a>
+  );
+
+  const Hamburger = () => (
+    <button
+      onClick={() => setMobileOpen((v) => !v)}
+      aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+      style={{
+        background: "none", border: "none", cursor: "pointer",
+        display: "flex", flexDirection: "column", gap: 5,
+        padding: "6px", borderRadius: 8, flexShrink: 0,
+      }}
+    >
+      <motion.span style={{ display: "block", width: 22, height: 2, background: "#374151", borderRadius: 2, transformOrigin: "center" }} animate={mobileOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }} transition={{ duration: 0.2 }} />
+      <motion.span style={{ display: "block", width: 22, height: 2, background: "#374151", borderRadius: 2 }} animate={mobileOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }} transition={{ duration: 0.2 }} />
+      <motion.span style={{ display: "block", width: 22, height: 2, background: "#374151", borderRadius: 2, transformOrigin: "center" }} animate={mobileOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }} transition={{ duration: 0.2 }} />
+    </button>
+  );
+
+  const MobileDropdown = () => (
+    <AnimatePresence>
+      {mobileOpen && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          style={{ overflow: "hidden", borderTop: "1px solid rgba(0,0,0,0.06)" }}
+        >
+          <div style={{ padding: "0.75rem 1.25rem 1.25rem", display: "flex", flexDirection: "column", gap: "0" }}>
+            {NAV_LINKS.map((link) => (
+              <button
+                key={link.href}
+                onClick={() => handleNavClick(link.href)}
+                style={{
+                  width: "100%", textAlign: "left", background: "none", border: "none",
+                  cursor: "pointer", fontFamily: "var(--font-body)", fontSize: "1rem",
+                  fontWeight: activeSection === link.href.replace("#", "") ? 600 : 400,
+                  color: activeSection === link.href.replace("#", "") ? "#2196F3" : "#374151",
+                  padding: "0.65rem 0", borderBottom: "1px solid rgba(0,0,0,0.05)",
+                  transition: "color 0.2s",
+                }}
+              >
+                {link.label}
+              </button>
+            ))}
+            <div style={{ paddingTop: "0.875rem" }}>
+              <a
+                href="https://www.instagram.com/irdive.tech?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: "block", background: "linear-gradient(135deg,#2196F3,#1976D2)",
+                  color: "white", fontFamily: "var(--font-body)", fontWeight: 600,
+                  textAlign: "center", padding: "0.8rem", borderRadius: 10, textDecoration: "none",
+                  boxShadow: "0 4px 14px rgba(33,150,243,0.35)",
+                }}
+              >
+                Hubungi Kami
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
   return (
     <>
-      <nav
-        style={{
-          position: "fixed",
-          top: scrolled ? 16 : 0,
-          left: scrolled ? "50%" : 0,
-          right: scrolled ? "auto" : 0,
-          transform: scrolled ? "translateX(-50%)" : "none",
-          width: scrolled ? "calc(100% - 32px)" : "100%",
-          maxWidth: scrolled ? 1168 : "100%",
-          zIndex: 100,
-          transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
-          background: scrolled ? "rgba(255, 255, 255, 0.15)" : "transparent",
-          backdropFilter: scrolled ? "blur(40px) saturate(2)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(40px) saturate(2)" : "none",
-          boxShadow: scrolled ? "0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.15)" : "none",
-          border: scrolled ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid transparent",
-          borderRadius: scrolled ? 24 : 0,
-        }}
-      >
-        <div 
-          className={scrolled ? "" : "container"} 
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "space-between", 
-            height: scrolled ? 64 : 80,
-            padding: scrolled ? "0 1.5rem" : "0",
-            transition: "height 0.3s, padding 0.3s"
+      {/* ─────────────────────────────────────────────────────────────
+          TOP BAR — not scrolled
+      ───────────────────────────────────────────────────────────── */}
+      {!scrolled && (
+        <nav
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0,
+            zIndex: 100,
+            background: "rgba(250,250,250,0.88)",
+            backdropFilter: "blur(14px) saturate(1.5)",
+            WebkitBackdropFilter: "blur(14px) saturate(1.5)",
+            borderBottom: "1px solid rgba(0,0,0,0.07)",
           }}
         >
-          {/* Logo */}
-          <a href="#home" onClick={() => handleNavClick("#home")} aria-label="IRDIVE — ke halaman utama">
-            <IrdiveLogo size="md" />
-          </a>
-
-          {/* Desktop nav */}
-          <ul
+          <div
             style={{
-              display: "none",
-              listStyle: "none",
-              gap: "2rem",
+              maxWidth: 1200,
+              margin: "0 auto",
+              display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
+              height: 72,
+              // Explicit horizontal padding on both edges — works on all screen sizes
+              paddingLeft: "1.25rem",
+              paddingRight: "1.25rem",
             }}
-            className="md:flex"
           >
-            {NAV_LINKS.map((link) => {
-              const isActive = activeSection === link.href.replace("#", "");
-              return (
-                <li key={link.href}>
-                  <button
-                    onClick={() => handleNavClick(link.href)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      fontFamily: "var(--font-body)",
-                      fontSize: "0.9rem",
-                      fontWeight: isActive ? 600 : 400,
-                      color: isActive ? "#2196F3" : "#4B5563",
-                      padding: "4px 0",
-                      position: "relative",
-                      transition: "color 0.2s",
-                    }}
-                  >
-                    {link.label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-underline"
-                        style={{
-                          position: "absolute",
-                          bottom: -2,
-                          left: 0,
-                          right: 0,
-                          height: 2,
-                          background: "#2196F3",
-                          borderRadius: 2,
-                        }}
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+            {/* Logo */}
+            <Logo height={LOGO_HEIGHT_TOP} />
 
-          {/* CTA + Hamburger */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <a
-              href="#contact"
-              onClick={() => handleNavClick("#contact")}
-              className="hidden md:inline-flex"
-              style={{
-                background: "#2196F3",
-                color: "white",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                padding: "0.5rem 1.25rem",
-                borderRadius: 10,
-                transition: "background 0.2s, transform 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#1565C0";
-                (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#2196F3";
-                (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-              }}
+            {/* Desktop: nav links (hidden on mobile via display:none → flex on bigger screens) */}
+            <div
+              className="hidden md:flex"
+              style={{ gap: "1.875rem", alignItems: "center" }}
             >
-              Hubungi Kami
-            </a>
+              <NavLinks layoutId="top-bar-underline" />
+            </div>
 
-            {/* Hamburger */}
-            <button
-              onClick={() => setMobileOpen((v) => !v)}
-              className="md:hidden"
-              aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                gap: 5,
-                padding: 4,
-              }}
-            >
-              <motion.span
-                style={{ display: "block", width: 22, height: 2, background: "#1E2328", borderRadius: 2, transformOrigin: "center" }}
-                animate={mobileOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-              <motion.span
-                style={{ display: "block", width: 22, height: 2, background: "#1E2328", borderRadius: 2 }}
-                animate={mobileOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.2 }}
-              />
-              <motion.span
-                style={{ display: "block", width: 22, height: 2, background: "#1E2328", borderRadius: 2, transformOrigin: "center" }}
-                animate={mobileOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-            </button>
+            {/* Desktop: CTA + Mobile: hamburger */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <div className="hidden md:inline-flex">
+                <CtaButton />
+              </div>
+              <div className="md:hidden">
+                <Hamburger />
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Mobile drawer */}
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                overflow: "hidden",
-                background: "rgba(250,250,250,0.97)",
-                backdropFilter: "blur(16px)",
-                borderTop: "1px solid #E5E7EB",
-              }}
+          {/* Mobile dropdown */}
+          <MobileDropdown />
+        </nav>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          FLOATING PILL — scrolled
+      ───────────────────────────────────────────────────────────── */}
+      {scrolled && (
+        <motion.nav
+          key="pill-nav"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            position: "fixed",
+            top: 12,
+            left: 0,
+            right: 0,
+            margin: "0 auto",
+            width: "calc(100% - 32px)",
+            maxWidth: 1100,
+            zIndex: 100,
+            borderRadius: 18,
+            // Clean premium glassmorphism — no SVG filter, no artifacts
+            background: "rgba(255, 255, 255, 0.35)",
+            backdropFilter: "blur(32px) saturate(1.7)",
+            WebkitBackdropFilter: "blur(32px) saturate(1.7)",
+            border: "1px solid rgba(255,255,255,0.95)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              height: 58,
+              paddingLeft: "1.25rem",
+              paddingRight: "1.25rem",
+            }}
+          >
+            {/* Logo */}
+            <Logo height={LOGO_HEIGHT_PILL} />
+
+            {/* Desktop nav links */}
+            <div
+              className="hidden md:flex"
+              style={{ gap: "1.75rem", alignItems: "center" }}
             >
-              <ul style={{ listStyle: "none", padding: "1rem 1.5rem 1.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                {NAV_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <button
-                      onClick={() => handleNavClick(link.href)}
-                      style={{
-                        width: "100%",
-                        textAlign: "left",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontFamily: "var(--font-body)",
-                        fontSize: "1rem",
-                        fontWeight: activeSection === link.href.replace("#", "") ? 600 : 400,
-                        color: activeSection === link.href.replace("#", "") ? "#2196F3" : "#4B5563",
-                        padding: "0.625rem 0",
-                        borderBottom: "1px solid #F3F4F6",
-                        transition: "color 0.2s",
-                      }}
-                    >
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
-                <li style={{ paddingTop: "0.75rem" }}>
-                  <a
-                    href="#contact"
-                    onClick={() => handleNavClick("#contact")}
-                    style={{
-                      display: "block",
-                      background: "#2196F3",
-                      color: "white",
-                      fontWeight: 600,
-                      textAlign: "center",
-                      padding: "0.75rem",
-                      borderRadius: 10,
-                    }}
-                  >
-                    Hubungi Kami
-                  </a>
-                </li>
-              </ul>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+              <NavLinks layoutId="pill-underline" />
+            </div>
+
+            {/* CTA + hamburger */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <div className="hidden md:inline-flex">
+                <CtaButton />
+              </div>
+              <div className="md:hidden">
+                <Hamburger />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile dropdown inside pill */}
+          <MobileDropdown />
+        </motion.nav>
+      )}
     </>
   );
 }

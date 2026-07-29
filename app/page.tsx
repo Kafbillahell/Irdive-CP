@@ -64,9 +64,6 @@ export default function Home() {
           <p style={{ fontSize: "0.85rem", color: "#9CA3AF" }}>
             © {new Date().getFullYear()} IRDIVE. All rights reserved.
           </p>
-          <p style={{ fontSize: "0.85rem", color: "#9CA3AF" }}>
-            Dibangun dengan ❤️ menggunakan Next.js
-          </p>
         </div>
       </footer>
     </>

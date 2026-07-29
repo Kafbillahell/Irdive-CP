@@ -17,22 +17,22 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "IRDIVE — Build Better Digital Experiences",
+  title: "IRDIVE — Tampil Lebih Profesional di Dunia Digital",
   description:
-    "IRDIVE membantu bisnis membangun website, web app, dan solusi digital yang cepat, scalable, dan punya dampak nyata. Company profile, landing page, custom web app, dan lebih banyak lagi.",
+    "IRDIVE membantu bisnis Indonesia membangun website, web app, dan solusi digital yang cepat, profesional, dan berdampak nyata. Company profile, landing page, custom web app, dan lebih banyak lagi.",
   keywords: ["web development", "company profile", "landing page", "web app", "UI/UX design", "Indonesia"],
   authors: [{ name: "IRDIVE" }],
   openGraph: {
-    title: "IRDIVE — Build Better Digital Experiences",
-    description: "Studio digital yang membantu bisnis tampil lebih baik di dunia digital.",
+    title: "IRDIVE — Tampil Lebih Profesional di Dunia Digital",
+    description: "Studio digital yang membantu bisnis Indonesia tampil profesional dan tumbuh lewat kanal digital.",
     type: "website",
     locale: "id_ID",
     siteName: "IRDIVE",
   },
   twitter: {
     card: "summary_large_image",
-    title: "IRDIVE — Build Better Digital Experiences",
-    description: "Studio digital yang membantu bisnis tampil lebih baik di dunia digital.",
+    title: "IRDIVE — Tampil Lebih Profesional di Dunia Digital",
+    description: "Studio digital yang membantu bisnis Indonesia tampil profesional dan tumbuh lewat kanal digital.",
   },
   robots: {
     index: true,
