@@ -53,18 +53,33 @@ export default function Navbar() {
       <nav
         style={{
           position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
+          top: scrolled ? 16 : 0,
+          left: scrolled ? "50%" : 0,
+          right: scrolled ? "auto" : 0,
+          transform: scrolled ? "translateX(-50%)" : "none",
+          width: scrolled ? "calc(100% - 32px)" : "100%",
+          maxWidth: scrolled ? 1168 : "100%",
           zIndex: 100,
-          transition: "background 0.3s, box-shadow 0.3s, backdrop-filter 0.3s",
-          background: scrolled ? "rgba(250,250,250,0.88)" : "transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
-          boxShadow: scrolled ? "0 1px 0 0 #E5E7EB" : "none",
+          transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+          background: scrolled ? "rgba(255, 255, 255, 0.75)" : "transparent",
+          backdropFilter: scrolled ? "blur(24px) saturate(1.8)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(1.8)" : "none",
+          boxShadow: scrolled ? "0 4px 32px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)" : "none",
+          border: scrolled ? "1px solid rgba(255, 255, 255, 0.4)" : "1px solid transparent",
+          borderRadius: scrolled ? 24 : 0,
         }}
       >
-        <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
+        <div 
+          className={scrolled ? "" : "container"} 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between", 
+            height: scrolled ? 64 : 80,
+            padding: scrolled ? "0 1.5rem" : "0",
+            transition: "height 0.3s, padding 0.3s"
+          }}
+        >
           {/* Logo */}
           <a href="#home" onClick={() => handleNavClick("#home")} aria-label="IRDIVE — ke halaman utama">
             <IrdiveLogo size="md" />

@@ -234,7 +234,7 @@ export default function HeroSection() {
         }
         @media (min-width: 960px) {
           .hero-section {
-            padding-top: calc(64px + 4rem);
+            padding-top: calc(64px + 1rem);
             padding-bottom: 5rem;
           }
           .hero-grid {

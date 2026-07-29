@@ -44,7 +44,7 @@ export default function MascotCarousel() {
           left: -100px;
           top: -100px;
         }
-        .slot-0 { transform: translate(0%, 30px) scale(1); z-index: 3; opacity: 1; filter: drop-shadow(0 16px 32px rgba(33,150,243,0.25)); }
+        .slot-0 { transform: translate(0%, 0px) scale(1); z-index: 3; opacity: 1; filter: drop-shadow(0 16px 32px rgba(33,150,243,0.25)); }
         .slot-1 { transform: translate(90px, -40px) scale(0.6); z-index: 1; opacity: 0.7; filter: drop-shadow(0 8px 16px rgba(33,150,243,0.1)); }
         .slot-2 { transform: translate(-90px, -40px) scale(0.6); z-index: 1; opacity: 0.7; filter: drop-shadow(0 8px 16px rgba(33,150,243,0.1)); }
         
@@ -59,9 +59,9 @@ export default function MascotCarousel() {
             left: -160px;
             top: -160px;
           }
-          .slot-0 { transform: translate(0%, 40px) scale(1); }
-          .slot-1 { transform: translate(140px, -60px) scale(0.65); }
-          .slot-2 { transform: translate(-140px, -60px) scale(0.65); }
+          .slot-0 { transform: translate(0%, 0px) scale(1); }
+          .slot-1 { transform: translate(140px, -50px) scale(0.65); }
+          .slot-2 { transform: translate(-140px, -50px) scale(0.65); }
         }
       `}</style>
       

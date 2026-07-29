@@ -1,47 +1,19 @@
 'use client';
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export type SectionBgVariant =
-  | "mascot-right" // faint mascot watermark right
-  | "mascot-left"  // faint mascot watermark left
-  | "rings-only"   // just subtle rings
-  | "full";        // mascot right + subtle rings + professional lines
+  | "mascot-right"
+  | "mascot-left"
+  | "rings-only"
+  | "full";
 
 interface SectionBgProps {
   variant?: SectionBgVariant;
-  /** mascot image src */
   mascotSrc?: string;
-  /** opacity of mascot watermark, default 0.04 */
   mascotOpacity?: number;
-}
-
-/** Decorative modern ring */
-function SubtleRing({
-  size = 400,
-  borderWidth = 1,
-  style,
-}: {
-  size?: number;
-  borderWidth?: number;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        border: `${borderWidth}px solid var(--theme-border)`,
-        opacity: 0.15,
-        zIndex: 0,
-        pointerEvents: "none",
-        ...style,
-      }}
-    />
-  );
 }
 
 export default function SectionBg({
@@ -51,8 +23,11 @@ export default function SectionBg({
 }: SectionBgProps) {
   const hasMascotR = ["mascot-right", "full"].includes(variant);
   const hasMascotL = ["mascot-left"].includes(variant);
-  const hasRings   = ["rings-only", "full"].includes(variant);
-  
+  const prefersReduced = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
   return (
     <div 
       aria-hidden="true"
@@ -64,19 +39,66 @@ export default function SectionBg({
         zIndex: 0,
       }}
     >
+      <style>{`
+        @keyframes blockFloat1 {
+          0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+          33% { transform: translate(3%, 5%) scale(1.05) rotate(5deg); }
+          66% { transform: translate(-2%, 2%) scale(0.95) rotate(-3deg); }
+        }
+        @keyframes blockFloat2 {
+          0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+          33% { transform: translate(-4%, -5%) scale(1.1) rotate(-5deg); }
+          66% { transform: translate(2%, -3%) scale(0.9) rotate(3deg); }
+        }
+        @keyframes blockFloat3 {
+          0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+          50% { transform: translate(5%, -5%) scale(1.05) rotate(-2deg); }
+        }
+        .aurora-blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(60px);
+          opacity: 0.6;
+          will-change: transform;
+        }
+        .aurora-1 {
+          background: radial-gradient(circle at center, rgba(33, 150, 243, 0.15) 0%, transparent 70%);
+          width: clamp(400px, 80vw, 800px);
+          height: clamp(400px, 80vw, 800px);
+          top: -20%;
+          left: -10%;
+          animation: ${!mounted || prefersReduced ? 'none' : 'blockFloat1 20s ease-in-out infinite'};
+        }
+        .aurora-2 {
+          background: radial-gradient(circle at center, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+          width: clamp(300px, 60vw, 600px);
+          height: clamp(300px, 60vw, 600px);
+          bottom: -15%;
+          right: -10%;
+          animation: ${!mounted || prefersReduced ? 'none' : 'blockFloat2 25s ease-in-out infinite reverse'};
+        }
+        .aurora-3 {
+          background: radial-gradient(circle at center, rgba(21, 101, 192, 0.12) 0%, transparent 70%);
+          width: clamp(300px, 50vw, 700px);
+          height: clamp(300px, 50vw, 700px);
+          top: 30%;
+          left: 30%;
+          animation: ${!mounted || prefersReduced ? 'none' : 'blockFloat3 18s ease-in-out infinite'};
+        }
+      `}</style>
+
+      {/* ── Aurora Mesh Gradients ── */}
+      <div className="aurora-blob aurora-1" />
+      <div className="aurora-blob aurora-2" />
+      <div className="aurora-blob aurora-3" />
+
       {/* ── Professional faint architectural lines (only on full) ── */}
       {variant === "full" && (
         <>
-          <div style={{ position: "absolute", left: "10%", top: 0, bottom: 0, width: 1, background: "var(--theme-border)", opacity: 0.05 }} />
-          <div style={{ position: "absolute", right: "10%", top: 0, bottom: 0, width: 1, background: "var(--theme-border)", opacity: 0.05 }} />
-        </>
-      )}
-
-      {/* ── Subtle Geometric Rings ── */}
-      {hasRings && (
-        <>
-          <SubtleRing size={500} style={{ top: "-10%", right: "-10%" }} />
-          <SubtleRing size={300} style={{ bottom: "10%", left: "-5%" }} />
+          <div style={{ position: "absolute", left: "15%", top: 0, bottom: 0, width: 1, background: "var(--theme-border)", opacity: 0.3 }} />
+          <div style={{ position: "absolute", right: "15%", top: 0, bottom: 0, width: 1, background: "var(--theme-border)", opacity: 0.3 }} />
+          <div style={{ position: "absolute", left: 0, right: 0, top: "25%", height: 1, background: "var(--theme-border)", opacity: 0.15 }} />
+          <div style={{ position: "absolute", left: 0, right: 0, top: "75%", height: 1, background: "var(--theme-border)", opacity: 0.15 }} />
         </>
       )}
 
@@ -90,7 +112,7 @@ export default function SectionBg({
             width: "clamp(300px, 45vw, 600px)",
             aspectRatio: "1",
             opacity: mascotOpacity,
-            filter: "grayscale(30%)",
+            filter: "grayscale(20%)",
           }}
         >
           <Image
@@ -112,7 +134,7 @@ export default function SectionBg({
             width: "clamp(250px, 35vw, 500px)",
             aspectRatio: "1",
             opacity: mascotOpacity,
-            filter: "grayscale(30%)",
+            filter: "grayscale(20%)",
           }}
         >
           <Image
