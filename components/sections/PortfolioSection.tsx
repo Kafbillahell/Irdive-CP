@@ -241,6 +241,9 @@ export default function PortfolioSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const rafRef = useRef<number | null>(null);
   const smoothCenter = useRef<number | null>(null);
+  const lastZIndexes = useRef<Map<HTMLElement, number>>(new Map());
+  const candidateIndex = useRef<number | null>(null);
+  const stableFrames = useRef<number>(0);
 
   const carouselItems = [
     { ...PORTFOLIO_ITEMS[PORTFOLIO_ITEMS.length - 1], clone: true, realIndex: PORTFOLIO_ITEMS.length - 1 },
@@ -269,6 +272,10 @@ export default function PortfolioSection() {
 
       const allCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper'));
 
+      // gather real card centers for indicator mapping
+      const realCards = Array.from(slider.querySelectorAll<HTMLElement>('.pf-card-wrapper[data-idx]'));
+      const realCenters = realCards.map((c) => c.offsetLeft + c.offsetWidth / 2);
+
       allCards.forEach((card) => {
         const cardCenter = card.offsetLeft + card.offsetWidth / 2;
         const norm = Math.max(-1, Math.min(1, (cardCenter - center) / (sliderRect.width / 2)));
@@ -282,8 +289,45 @@ export default function PortfolioSection() {
         // apply transforms directly without per-scroll heavy layout reads
         card.style.transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
         card.style.transformStyle = 'preserve-3d';
-        card.style.zIndex = String(Math.round(absNorm * 200) + 1);
+
+        // only update zIndex if changed to avoid unnecessary paint
+        const newZ = Math.round(absNorm * 200) + 1;
+        const prevZ = lastZIndexes.current.get(card) ?? -1;
+        if (newZ !== prevZ) {
+          card.style.zIndex = String(newZ);
+          lastZIndexes.current.set(card, newZ);
+        }
       });
+
+      // auto-detect closest real card; require stability across frames to avoid flicker
+      if (realCenters.length > 0) {
+        let minIdx = 0;
+        let minDist = Math.abs(realCenters[0] - center);
+        for (let i = 1; i < realCenters.length; i++) {
+          const d = Math.abs(realCenters[i] - center);
+          if (d < minDist) {
+            minDist = d;
+            minIdx = i;
+          }
+        }
+
+        // resolve actual realIndex from DOM element's data-idx to be exact
+        const closestEl = realCards[minIdx];
+        const realIndex = closestEl ? Number(closestEl.dataset.idx) : minIdx;
+
+        const currentCandidate = candidateIndex.current;
+        if (currentCandidate === realIndex) {
+          stableFrames.current += 1;
+        } else {
+          candidateIndex.current = realIndex;
+          stableFrames.current = 0;
+        }
+
+        // if stable for ~4 frames (~66ms) update activeIndex for snappier UX
+        if (stableFrames.current >= 4 && activeIndex !== realIndex) {
+          setActiveIndex(realIndex);
+        }
+      }
 
       rafRef.current = requestAnimationFrame(run);
     };
@@ -294,6 +338,8 @@ export default function PortfolioSection() {
       rafRef.current = null;
     };
   }, [shouldReduce]);
+
+  // no bubble indicator measuring — active index will be detected automatically in RAF loop
 
   useEffect(() => {
     if (shouldReduce || PORTFOLIO_ITEMS.length <= 1) return;
