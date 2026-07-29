@@ -74,7 +74,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
     });
   }, { scope: ref });
 
-      return (
+  return (
     <motion.div
       ref={ref}
       initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
@@ -83,7 +83,7 @@ function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) 
       style={{
         flexShrink: 0,
         scrollSnapAlign: "center",
-        width: "min(72vw, 340px)",
+        width: "85vw",
         maxWidth: 380,
         height: 480, // Fixed height for absolute image cover layout
         position: "relative",
@@ -265,21 +265,17 @@ export default function PortfolioSection() {
 
   const goToIndex = (index: number) => {
     const slider = sliderRef.current;
-    if (!slider) {
-      setActiveIndex(index);
-      return;
-    }
-    // suppress auto detection for a short moment to avoid conflicts
-    suppressAutoDetectUntil.current = Date.now() + 500;
+    // suppress auto detection while programmatic scroll settles
+    suppressAutoDetectUntil.current = Date.now() + 600;
     setActiveIndex(index);
-    // programmatic scroll
-    scrollToIndex(index);
-    // sync smoothCenter to avoid RAF detecting a different center
+    if (!slider) return;
     const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
-    if (target) {
-      const center = target.offsetLeft + target.offsetWidth / 2;
-      smoothCenter.current = slider.scrollLeft + (center - (slider.scrollLeft + slider.clientWidth / 2));
-    }
+    if (!target) return;
+    const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
+    slider.scrollTo({ left, behavior: "smooth" });
+    // nudge smoothCenter to expected center to avoid RAF jitter
+    const center = target.offsetLeft + target.offsetWidth / 2;
+    smoothCenter.current = slider.scrollLeft + (center - (slider.scrollLeft + slider.clientWidth / 2));
     candidateIndex.current = index;
     stableFrames.current = 0;
   };
@@ -327,7 +323,6 @@ export default function PortfolioSection() {
       });
 
       // auto-detect closest real card; require stability across frames to avoid flicker
-      // but skip while programmatic scroll just happened
       if (Date.now() < suppressAutoDetectUntil.current) {
         rafRef.current = requestAnimationFrame(run);
         return;
@@ -373,7 +368,7 @@ export default function PortfolioSection() {
 
   // no bubble indicator measuring — active index will be detected automatically in RAF loop
 
-  // removed auto-centering effect to avoid recursion; initial centering handled on mount
+  // remove automatic effect that always scrolls on activeIndex change
 
   // Update accent color smoothly when active index changes
   useEffect(() => {
@@ -445,7 +440,7 @@ export default function PortfolioSection() {
                 display: "flex",
                 gap: "1.5rem",
                 padding: "2rem 5vw 4rem 5vw",
-                overflowX: "auto",
+                overflowX: "hidden",
                 scrollSnapType: "x mandatory",
                 WebkitOverflowScrolling: "touch",
                 perspective: 1400,
@@ -472,7 +467,6 @@ export default function PortfolioSection() {
               }}
               onPointerMove={(e) => {
                 if (!sliderPointer.current.active) return;
-                // prevent native panning/scrolling while pointer is down
                 e.preventDefault();
               }}
               onPointerUp={(e) => {
@@ -550,7 +544,7 @@ export default function PortfolioSection() {
               {PORTFOLIO_ITEMS.map((item, i) => {
                 const isActive = i === activeIndex;
                 return (
-                  <button
+                    <button
                     key={`bubble-${item.id}`}
                     type="button"
                     aria-label={`Lihat portofolio ${item.title}`}
