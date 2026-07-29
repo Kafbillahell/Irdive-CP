@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Space_Grotesk } from "next/font/google";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import IrdiveMaskot from "@/components/logo-maskot/IrdiveMaskot";
+import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["700", "500"] });
 import Button from "@/components/ui/Button";
@@ -98,20 +98,8 @@ function HeroParallaxMascot({ shouldReduceMotion }: { shouldReduceMotion: boolea
       style={{ display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}
     >
       <div className="hero-mascot-col">
-        <div
-          className="mascot-backdrop"
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, var(--theme-border) 0%, transparent 70%)",
-            zIndex: 0,
-            top: 0,
-            left: 0,
-          }}
-        />
         <div ref={mascotInner} className="mascot-inner" style={{ position: "relative", zIndex: 1 }}>
-          <IrdiveMaskot size="xl" preload />
+          <MascotCarousel />
         </div>
       </div>
     </motion.div>
@@ -192,11 +180,14 @@ export default function HeroSection() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr",
-            gap: "3rem",
+            gap: "1.5rem",
             alignItems: "center",
           }}
           className="hero-grid"
         >
+          {/* Mascot — renders first (top) on mobile via order */}
+          <HeroParallaxMascot shouldReduceMotion={!!shouldReduceMotion} />
+
           {/* Left: Text content */}
           <div style={{ maxWidth: 640 }}>
             {/* Label tag */}
@@ -252,35 +243,31 @@ export default function HeroSection() {
               ))}
             </motion.div>
           </div>
-
-          <HeroParallaxMascot shouldReduceMotion={!!shouldReduceMotion} />
         </div>
       </div>
 
       <style>{`
         .hero-section {
-          padding-top: calc(64px + 2rem);
-          padding-bottom: 3rem;
+          padding-top: calc(64px + 1rem);
+          padding-bottom: 2rem;
         }
         .hero-grid {
           grid-template-columns: 1fr !important;
-          gap: 2rem !important;
+          gap: 0.5rem !important;
         }
         .hero-mascot-col {
-          position: absolute;
-          right: -2rem;
-          top: 0;
-          transform: scale(0.65);
-          transform-origin: top right;
-          pointer-events: none;
-          z-index: 0;
-          opacity: 0.8;
+          position: relative;
+          right: auto;
+          top: auto;
+          pointer-events: auto;
+          z-index: 1;
+          display: flex;
+          justify-content: center;
         }
-        .mascot-backdrop { width: 280px; height: 280px; }
+        .mascot-inner { width: 100%; }
         .hero-btn { font-size: 0.9rem !important; padding: 0.75rem 1.25rem !important; }
         
         @media (min-width: 640px) {
-          .hero-mascot-col { right: 0; transform: scale(0.8); }
           .hero-btn { font-size: 1rem !important; padding: 1rem 1.75rem !important; }
         }
         @media (min-width: 960px) {
@@ -293,13 +280,7 @@ export default function HeroSection() {
             gap: 3rem !important;
           }
           .hero-mascot-col { 
-            position: relative; 
-            right: auto; top: auto; 
-            transform: scale(1);
-            pointer-events: auto;
-            opacity: 1;
-            display: flex;
-            justify-content: center;
+            order: 0;
           }
         }
       `}</style>
