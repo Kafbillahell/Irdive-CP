@@ -122,7 +122,7 @@ export default function HeroSection() {
       style={{
         background: "transparent",
         color: "var(--theme-text)",
-        overflow: "hidden",
+        overflow: "visible",
         position: "relative",
         minHeight: "100svh",
         display: "flex",

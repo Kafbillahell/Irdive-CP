@@ -35,23 +35,26 @@ export default function MascotCarousel() {
     >
       <style>{`
         .carousel-container {
-          max-width: 380px;
-          height: 320px;
+          max-width: 520px;
+          height: 380px;
+          overflow: visible;
         }
         .carousel-anchor {
-          width: 200px;
-          height: 200px;
-          left: -100px;
-          top: -100px;
+          width: 220px;
+          height: 220px;
+          left: -110px;
+          top: -110px;
+          transform-origin: center center;
         }
-        .slot-0 { transform: translate(0%, 0px) scale(1); z-index: 3; opacity: 1; filter: drop-shadow(0 16px 32px rgba(33,150,243,0.25)); }
-        .slot-1 { transform: translate(90px, -40px) scale(0.6); z-index: 1; opacity: 0.7; filter: drop-shadow(0 8px 16px rgba(33,150,243,0.1)); }
-        .slot-2 { transform: translate(-90px, -40px) scale(0.6); z-index: 1; opacity: 0.7; filter: drop-shadow(0 8px 16px rgba(33,150,243,0.1)); }
+        .slot-0 { transform: translate(0px, 0px) scale(1); z-index: 3; opacity: 1; filter: drop-shadow(0 18px 40px rgba(33,150,243,0.25)); }
+        .slot-1 { transform: translate(120px, -20px) scale(0.68); z-index: 1; opacity: 0.78; filter: drop-shadow(0 10px 20px rgba(33,150,243,0.12)); }
+        .slot-2 { transform: translate(-120px, -20px) scale(0.68); z-index: 1; opacity: 0.78; filter: drop-shadow(0 10px 20px rgba(33,150,243,0.12)); }
         
         @media (min-width: 960px) {
           .carousel-container {
-            max-width: 550px;
-            height: 480px;
+            max-width: 720px;
+            height: 520px;
+            overflow: visible;
           }
           .carousel-anchor {
             width: 320px;
@@ -59,9 +62,9 @@ export default function MascotCarousel() {
             left: -160px;
             top: -160px;
           }
-          .slot-0 { transform: translate(0%, 0px) scale(1); }
-          .slot-1 { transform: translate(140px, -50px) scale(0.65); }
-          .slot-2 { transform: translate(-140px, -50px) scale(0.65); }
+          .slot-0 { transform: translate(0px, 0px) scale(1); }
+          .slot-1 { transform: translate(180px, -20px) scale(0.72); }
+          .slot-2 { transform: translate(-180px, -20px) scale(0.72); }
         }
       `}</style>
       
