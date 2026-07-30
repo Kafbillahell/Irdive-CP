@@ -239,6 +239,8 @@ export default function PortfolioSection() {
   const lastTapTargetRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
   const smoothCenter = useRef<number | null>(null);
+  const targetScrollCenter = useRef<number | null>(null);
+  const programmaticIndex = useRef<number | null>(null);
   const candidateIndex = useRef<number | null>(null);
   const stableFrames = useRef<number>(0);
   const readyRef = useRef(false); // becomes true after the initial instant centering
@@ -280,9 +282,10 @@ export default function PortfolioSection() {
     const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
     slider.scrollTo({ left, behavior });
 
-    // keep the RAF loop's notion of "center" in sync so it doesn't fight the scroll
     const center = target.offsetLeft + target.offsetWidth / 2;
-    smoothCenter.current = behavior === "auto" ? center : slider.scrollLeft + (center - (slider.scrollLeft + slider.clientWidth / 2));
+    smoothCenter.current = center;
+    targetScrollCenter.current = center;
+    programmaticIndex.current = index;
     candidateIndex.current = index;
     stableFrames.current = 0;
   };
@@ -366,16 +369,27 @@ export default function PortfolioSection() {
 
         const closestEl = realCards[minIdx];
         const realIndex = closestEl ? Number(closestEl.dataset.idx) : minIdx;
+        let resolvedIndex = realIndex;
 
-        if (candidateIndex.current === realIndex) {
+        if (programmaticIndex.current !== null && targetScrollCenter.current !== null) {
+          const distanceToTarget = Math.abs(center - targetScrollCenter.current);
+          if (distanceToTarget > 8) {
+            resolvedIndex = programmaticIndex.current;
+          } else {
+            programmaticIndex.current = null;
+            targetScrollCenter.current = null;
+          }
+        }
+
+        if (candidateIndex.current === resolvedIndex) {
           stableFrames.current += 1;
         } else {
-          candidateIndex.current = realIndex;
+          candidateIndex.current = resolvedIndex;
           stableFrames.current = 0;
         }
 
         if (readyRef.current && stableFrames.current >= 4) {
-          setActiveIndex((prev) => (prev !== realIndex ? realIndex : prev));
+          setActiveIndex((prev) => (prev !== resolvedIndex ? resolvedIndex : prev));
         }
       }
 
@@ -508,7 +522,7 @@ export default function PortfolioSection() {
                     }
                     style={{
                       flexShrink: 0,
-                      transition: "transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
+                      transition: "opacity 0.3s ease, filter 0.3s ease",
                       scrollSnapAlign: "center",
                       cursor: isInteractive ? "pointer" : "default",
                       willChange: "transform",
