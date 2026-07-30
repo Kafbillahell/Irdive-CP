@@ -11,14 +11,32 @@ const EASING = [0.22, 1, 0.36, 1] as const;
 // Deteksi apakah perangkat menggunakan touch (mobile) — dipakai untuk mematikan
 // interaksi klik/geser pada card di mobile agar tidak mengganggu scroll halaman.
 function useIsTouchDevice() {
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch, setIsTouch] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return (
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      navigator.msMaxTouchPoints > 0 ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    );
+  });
+
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
-    const update = () => setIsTouch(mq.matches);
+    const update = () => {
+      setIsTouch(
+        "ontouchstart" in window ||
+          navigator.maxTouchPoints > 0 ||
+          navigator.msMaxTouchPoints > 0 ||
+          mq.matches
+      );
+    };
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
+
   return isTouch;
 }
 
@@ -497,8 +515,9 @@ export default function PortfolioSection() {
                       // Kunci perbaikan: di mobile, card tidak menangkap event apa pun
                       // (klik, tap, drag) — sentuhan tembus ke halaman untuk scroll biasa.
                       pointerEvents: isClone || isTouch ? "none" : "auto",
-                      touchAction: "pan-y",
+                      touchAction: isClone || isTouch ? "auto" : "pan-y",
                       userSelect: "none",
+                      WebkitTapHighlightColor: "transparent",
                       boxShadow: isClone ? "inset 0 -10px 40px rgba(0,0,0,0.45)" : undefined,
                     }}
                   >
@@ -562,6 +581,22 @@ export default function PortfolioSection() {
 
         .pf-card-wrapper:hover .pf-bg-img {
           transform: scale(1.05);
+        }
+
+        @media (hover: none) and (pointer: coarse), (hover: none) {
+          .pf-card-wrapper,
+          .pf-card-wrapper * {
+            pointer-events: none !important;
+            touch-action: auto !important;
+            -webkit-user-drag: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+          }
+
+          .pf-card-wrapper:hover .pf-bg-img,
+          .pf-card-wrapper:active .pf-bg-img {
+            transform: none !important;
+            transition: none !important;
+          }
         }
       `}</style>
     </section>
