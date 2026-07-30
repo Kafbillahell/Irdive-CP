@@ -161,7 +161,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
 
 // ── Contact ───────────────────────────────────────────────────
 export const CONTACT_INFO = {
-  whatsapp: "6280954677", // ganti dengan nomor lengkap jika perlu
+  whatsapp: "6285721326004",
   email: "irdive.tech@gmail.com",
   instagram: "@irdive.tech",
   tiktok: "@irdive.tech",
