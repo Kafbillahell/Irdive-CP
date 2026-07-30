@@ -16,7 +16,7 @@ export default function MascotCarousel() {
 
   useEffect(() => {
     if (prefersReduced) return;
-    const id = setInterval(() => setFront((p) => (p + 1) % 3), 5000);
+    const id = setInterval(() => setFront((p) => (p + 1) % 3), 3000);
     return () => clearInterval(id);
   }, [prefersReduced]);
 
@@ -26,7 +26,7 @@ export default function MascotCarousel() {
   return (
     <div
       aria-hidden="true"
-      className="carousel-container"
+      className="carousel-container carousel-scene"
       style={{
         position: "relative",
         width: "100%",
@@ -37,6 +37,11 @@ export default function MascotCarousel() {
       }}
     >
       <style>{`
+        .carousel-scene {
+          transform-style: preserve-3d;
+          perspective: 1200px;
+          perspective-origin: center;
+        }
         .carousel-container {
           max-width: 520px;
           height: 380px;
@@ -48,10 +53,27 @@ export default function MascotCarousel() {
           left: -110px;
           top: -110px;
           transform-origin: center center;
+          transform-style: preserve-3d;
+          backface-visibility: hidden;
         }
-        .slot-0 { transform: translate(0px, 0px) scale(1); z-index: 3; opacity: 1; filter: drop-shadow(0 18px 40px rgba(33,150,243,0.25)); }
-        .slot-1 { transform: translate(120px, -20px) scale(0.68); z-index: 1; opacity: 0.78; filter: drop-shadow(0 10px 20px rgba(33,150,243,0.12)); }
-        .slot-2 { transform: translate(-120px, -20px) scale(0.68); z-index: 1; opacity: 0.78; filter: drop-shadow(0 10px 20px rgba(33,150,243,0.12)); }
+        .carousel-asset {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          transform: translateZ(0);
+          will-change: transform;
+        }
+        .slot-0 {
+          transform: translate3d(0px, 0px, 0px) rotateY(0deg) scale(1);
+          z-index: 3;
+          opacity: 1;
+          filter: drop-shadow(0 18px 40px rgba(33,150,243,0.25));
+        }
+        .slot-0 .carousel-asset {
+          animation: breathe-front 4.2s ease-in-out infinite;
+        }
+        .slot-1 { transform: translate3d(130px, -25px, -140px) rotateY(-26deg) scale(0.68); z-index: 1; opacity: 0.78; filter: drop-shadow(0 10px 20px rgba(33,150,243,0.12)); }
+        .slot-2 { transform: translate3d(-130px, -25px, -140px) rotateY(26deg) scale(0.68); z-index: 1; opacity: 0.78; filter: drop-shadow(0 10px 20px rgba(33,150,243,0.12)); }
         
         @media (min-width: 960px) {
           .carousel-container {
@@ -65,9 +87,20 @@ export default function MascotCarousel() {
             left: -160px;
             top: -160px;
           }
-          .slot-0 { transform: translate(0px, 0px) scale(1); }
-          .slot-1 { transform: translate(180px, -20px) scale(0.72); }
-          .slot-2 { transform: translate(-180px, -20px) scale(0.72); }
+          .slot-0 {
+            transform: translate3d(0px, 0px, 0px) rotateY(0deg) scale(1);
+          }
+          .slot-1 { transform: translate3d(200px, -28px, -170px) rotateY(-24deg) scale(0.72); }
+          .slot-2 { transform: translate3d(-200px, -28px, -170px) rotateY(24deg) scale(0.72); }
+        }
+
+        @keyframes breathe-front {
+          0%, 100% {
+            transform: scale(1) translate3d(0, 0, 0);
+          }
+          50% {
+            transform: scale(1.01) translate3d(0, -2px, 0);
+          }
         }
       `}</style>
       
@@ -108,17 +141,19 @@ export default function MascotCarousel() {
                 position: "absolute",
                 transition: prefersReduced
                   ? "none"
-                  : "transform 0.65s cubic-bezier(0.22,1,0.36,1), opacity 0.5s ease",
+                  : "transform 0.8s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease",
                 willChange: "transform, opacity",
               }}
             >
-              <Image
-                src={m.src}
-                alt={m.alt}
-                fill
-                loading="eager"
-                style={{ objectFit: "contain" }}
-              />
+              <div className="carousel-asset">
+                  <Image
+                  src={m.src}
+                  alt={m.alt}
+                  fill
+                  loading="eager"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
             </div>
           );
         })}
