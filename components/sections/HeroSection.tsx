@@ -2,8 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
 import SectionBg from "@/components/ui/SectionBg";
@@ -53,53 +51,19 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
   );
 }
 
-function HeroParallaxMascot({ shouldReduceMotion }: { shouldReduceMotion: boolean }) {
-  const container = useRef<HTMLDivElement>(null);
-  const mascotInner = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    if (shouldReduceMotion) return;
-    const mm = gsap.matchMedia();
-    mm.add("(hover: hover) and (pointer: fine)", () => {
-      const xTo = gsap.quickTo(mascotInner.current, "x", { duration: 0.6, ease: "power3.out" });
-      const yTo = gsap.quickTo(mascotInner.current, "y", { duration: 0.6, ease: "power3.out" });
-
-      const handleMove = (e: MouseEvent) => {
-        const dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-        const dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        xTo(dx * 45); 
-        yTo(dy * 45);
-      };
-      
-      window.addEventListener("mousemove", handleMove);
-      return () => window.removeEventListener("mousemove", handleMove);
-    });
-
-    mm.add("(hover: none)", () => {
-       const handleOrientation = (e: DeviceOrientationEvent) => {
-          if(e.gamma === null || e.beta === null) return;
-          const x = (e.gamma / 90) * 15; 
-          const y = (e.beta / 180) * 15;
-          gsap.to(mascotInner.current, { x, y, duration: 0.4, ease: "power2.out" });
-       }
-       window.addEventListener("deviceorientation", handleOrientation);
-       return () => window.removeEventListener("deviceorientation", handleOrientation);
-    });
-  }, { scope: container, dependencies: [shouldReduceMotion] });
-
+function HeroParallaxMascot() {
   return (
-    <motion.div
-      ref={container}
+    <div
       className="hero-mascot-col"
-      initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.9, delay: 0, ease: [0.22, 1, 0.36, 1] }}
-      style={{ position: "relative" }}
+      style={{ position: "relative", pointerEvents: "none" }}
     >
-      <div ref={mascotInner} className="mascot-inner" style={{ position: "relative", zIndex: 1, width: "100%", display: "flex", justifyContent: "center" }}>
+      <div
+        className="mascot-inner"
+        style={{ position: "relative", zIndex: 1, width: "100%", display: "flex", justifyContent: "center", pointerEvents: "none" }}
+      >
         <MascotCarousel />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -142,7 +106,7 @@ export default function HeroSection() {
           className="hero-grid"
         >
           {/* Mascot — mobile: top (order -1), desktop: right (order 2) */}
-          <HeroParallaxMascot shouldReduceMotion={!!shouldReduceMotion} />
+          <HeroParallaxMascot />
 
           {/* Text content — mobile: below mascot, desktop: left column (order 1) */}
           <div className="hero-text-col" style={{ maxWidth: 640 }}>

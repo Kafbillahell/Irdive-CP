@@ -25,12 +25,15 @@ export default function MascotCarousel() {
 
   return (
     <div
-      aria-label="IRDIVE mascot carousel"
+      aria-hidden="true"
       className="carousel-container"
       style={{
         position: "relative",
         width: "100%",
         margin: "0 auto",
+        userSelect: "none",
+        pointerEvents: "none",
+        touchAction: "none",
       }}
     >
       <style>{`
@@ -121,36 +124,6 @@ export default function MascotCarousel() {
         })}
       </div>
 
-      {/* Dot indicators */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          gap: 6,
-          zIndex: 10,
-        }}
-      >
-        {MASCOTS.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setFront(i)}
-            aria-label={`Mascot ${i + 1}`}
-            style={{
-              width: slotOf(i) === 0 ? 24 : 8,
-              height: 8,
-              borderRadius: 4,
-              border: "none",
-              cursor: "pointer",
-              background: slotOf(i) === 0 ? "#2196F3" : "#B0BEC5",
-              transition: "width 0.35s ease, background 0.35s ease",
-              padding: 0,
-            }}
-          />
-        ))}
-      </div>
     </div>
   );
 }

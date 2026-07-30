@@ -8,6 +8,20 @@ import SectionBg from "@/components/ui/SectionBg";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
+// Deteksi apakah perangkat menggunakan touch (mobile) — dipakai untuk mematikan
+// interaksi klik/geser pada card di mobile agar tidak mengganggu scroll halaman.
+function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const update = () => setIsTouch(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isTouch;
+}
+
 // Icon per portfolio item category
 const PORTFOLIO_ICONS: Record<string, React.ReactNode> = {
   featured: (
@@ -199,6 +213,7 @@ export default function PortfolioSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
   const shouldReduce = useReducedMotion();
+  const isTouch = useIsTouchDevice();
   const initialIndex = Math.floor(PORTFOLIO_ITEMS.length / 2);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
 
@@ -435,6 +450,7 @@ export default function PortfolioSection() {
                 perspective: 1400,
                 perspectiveOrigin: "50% 50%",
                 overscrollBehaviorX: "contain",
+                touchAction: "pan-y",
               }}
               onWheel={(e) => {
                 if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
@@ -444,33 +460,44 @@ export default function PortfolioSection() {
             >
               {carouselItems.map((item, i) => {
                 const isClone = item.clone;
+                // Di mobile (touch device), card sama sekali tidak merespons sentuhan/klik —
+                // supaya scroll halaman vertikal berjalan normal tanpa efek "ketarik".
+                // Navigasi tetap bisa lewat bubble indicator di bawah.
+                const isInteractive = !isClone && !isTouch;
 
                 return (
                   <div
                     key={`${item.id}-${i}`}
                     className="pf-card-wrapper"
                     data-idx={isClone ? undefined : item.realIndex}
-                    role={isClone ? undefined : "button"}
+                    role={isInteractive ? "button" : undefined}
                     aria-hidden={isClone ? true : undefined}
-                    tabIndex={isClone ? -1 : 0}
-                    onKeyDown={(e) => {
-                      if (isClone) return;
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        goToIndex(item.realIndex);
-                      }
-                    }}
-                    onClick={() => {
-                      if (isClone) return;
-                      handleCardTap(item.realIndex);
-                    }}
+                    tabIndex={isInteractive ? 0 : -1}
+                    onKeyDown={
+                      isInteractive
+                        ? (e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              goToIndex(item.realIndex);
+                            }
+                          }
+                        : undefined
+                    }
+                    onClick={
+                      isInteractive
+                        ? () => handleCardTap(item.realIndex)
+                        : undefined
+                    }
                     style={{
                       flexShrink: 0,
                       transition: "transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
                       scrollSnapAlign: "center",
-                      cursor: isClone ? "default" : "pointer",
+                      cursor: isInteractive ? "pointer" : "default",
                       willChange: "transform",
-                      pointerEvents: isClone ? "none" : "auto",
+                      // Kunci perbaikan: di mobile, card tidak menangkap event apa pun
+                      // (klik, tap, drag) — sentuhan tembus ke halaman untuk scroll biasa.
+                      pointerEvents: isClone || isTouch ? "none" : "auto",
+                      touchAction: "pan-y",
                       userSelect: "none",
                       boxShadow: isClone ? "inset 0 -10px 40px rgba(0,0,0,0.45)" : undefined,
                     }}

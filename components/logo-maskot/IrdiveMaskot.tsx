@@ -49,7 +49,13 @@ export default function IrdiveMaskot({
       className={className}
       variants={floatVariants}
       animate={shouldReduceMotion || noFloat ? "still" : "idle"}
-      style={{ display: "inline-block", willChange: "transform" }}
+      style={{
+        display: "inline-block",
+        willChange: "transform",
+        userSelect: "none",
+        pointerEvents: "none",
+        touchAction: "none",
+      }}
     >
       <Image
         src="/mascot.png"
@@ -57,6 +63,7 @@ export default function IrdiveMaskot({
         width={px}
         height={px}
         loading={preload ? "eager" : "lazy"}
+        draggable={false}
         style={{
           objectFit: "contain",
           filter: "drop-shadow(0 8px 24px rgba(33, 150, 243, 0.18))",
