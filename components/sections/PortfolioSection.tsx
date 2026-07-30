@@ -238,6 +238,7 @@ export default function PortfolioSection() {
   const tapLockRef = useRef<number | null>(null);
   const lastTapTargetRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
+  const scrollAnimationRef = useRef<number | null>(null);
   const smoothCenter = useRef<number | null>(null);
   const targetScrollCenter = useRef<number | null>(null);
   const programmaticIndex = useRef<number | null>(null);
@@ -280,14 +281,45 @@ export default function PortfolioSection() {
     const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
     if (!target) return;
     const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
-    slider.scrollTo({ left, behavior });
-
     const center = target.offsetLeft + target.offsetWidth / 2;
+
     smoothCenter.current = center;
     targetScrollCenter.current = center;
     programmaticIndex.current = index;
     candidateIndex.current = index;
     stableFrames.current = 0;
+
+    if (scrollAnimationRef.current) {
+      cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+    }
+
+    const originalSnap = slider.style.scrollSnapType;
+    slider.style.scrollSnapType = "none";
+
+    if (behavior === "smooth") {
+      const startLeft = slider.scrollLeft;
+      const distance = left - startLeft;
+      const duration = 420;
+      const startTime = performance.now();
+
+      const step = (now: number) => {
+        const elapsed = Math.min(1, (now - startTime) / duration);
+        const ease = 1 - Math.pow(1 - elapsed, 3);
+        slider.scrollLeft = startLeft + distance * ease;
+        if (elapsed < 1) {
+          scrollAnimationRef.current = requestAnimationFrame(step);
+        } else {
+          scrollAnimationRef.current = null;
+          slider.style.scrollSnapType = originalSnap || "x mandatory";
+        }
+      };
+
+      scrollAnimationRef.current = requestAnimationFrame(step);
+    } else {
+      slider.scrollLeft = left;
+      slider.style.scrollSnapType = originalSnap || "x mandatory";
+    }
   };
 
   // ── Instant centering BEFORE paint, so the carousel never visibly starts at card 1 ──
@@ -316,9 +348,15 @@ export default function PortfolioSection() {
       const sliderRect = slider.getBoundingClientRect();
       const targetCenter = slider.scrollLeft + sliderRect.width / 2;
 
+      const isProgrammatic = programmaticIndex.current !== null;
       if (smoothCenter.current == null) smoothCenter.current = targetCenter;
-      smoothCenter.current = smoothCenter.current + (targetCenter - smoothCenter.current) * 0.12;
-      const center = smoothCenter.current;
+      if (isProgrammatic) {
+        smoothCenter.current = targetCenter;
+      } else {
+        smoothCenter.current = smoothCenter.current + (targetCenter - smoothCenter.current) * 0.12;
+      }
+
+      const center = targetCenter;
 
       const allCards = Array.from(slider.querySelectorAll<HTMLElement>(".pf-card-wrapper"));
       const realCards = allCards.filter((c) => c.dataset.idx !== undefined);
@@ -372,57 +410,57 @@ export default function PortfolioSection() {
         let resolvedIndex = realIndex;
 
         if (programmaticIndex.current !== null && targetScrollCenter.current !== null) {
-          const distanceToTarget = Math.abs(center - targetScrollCenter.current);
-          if (distanceToTarget > 8) {
-            resolvedIndex = programmaticIndex.current;
+            const distanceToTarget = Math.abs(targetCenter - targetScrollCenter.current);
+            if (distanceToTarget > 4) {
+              resolvedIndex = programmaticIndex.current;
+            } else {
+              programmaticIndex.current = null;
+              targetScrollCenter.current = null;
+            }
+          }
+
+          if (candidateIndex.current === resolvedIndex) {
+            stableFrames.current += 1;
           } else {
-            programmaticIndex.current = null;
-            targetScrollCenter.current = null;
+            candidateIndex.current = resolvedIndex;
+            stableFrames.current = 0;
+          }
+
+          if (readyRef.current && stableFrames.current >= 3) {
+            setActiveIndex((prev) => (prev !== resolvedIndex ? resolvedIndex : prev));
           }
         }
 
-        if (candidateIndex.current === resolvedIndex) {
-          stableFrames.current += 1;
-        } else {
-          candidateIndex.current = resolvedIndex;
-          stableFrames.current = 0;
-        }
-
-        if (readyRef.current && stableFrames.current >= 4) {
-          setActiveIndex((prev) => (prev !== resolvedIndex ? resolvedIndex : prev));
-        }
-      }
+        rafRef.current = requestAnimationFrame(run);
+      };
 
       rafRef.current = requestAnimationFrame(run);
-    };
+      return () => {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      };
+    }, [shouldReduce]);
 
-    rafRef.current = requestAnimationFrame(run);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    };
-  }, [shouldReduce]);
+    // Update accent color smoothly when active index changes
+    useEffect(() => {
+      const color = PORTFOLIO_ITEMS[activeIndex]?.accentColor ?? "var(--theme-accent)";
+      if (sectionRef.current) {
+        sectionRef.current.style.setProperty("--portfolio-accent", color);
+      }
+    }, [activeIndex]);
 
-  // Update accent color smoothly when active index changes
-  useEffect(() => {
-    const color = PORTFOLIO_ITEMS[activeIndex]?.accentColor ?? "var(--theme-accent)";
-    if (sectionRef.current) {
-      sectionRef.current.style.setProperty("--portfolio-accent", color);
-    }
-  }, [activeIndex]);
-
-  return (
-    <section
-      id="portfolio"
-      ref={sectionRef as any}
-      style={{
-        background: "transparent",
-        paddingTop: "5rem",
-        paddingBottom: "5rem",
-        position: "relative",
-        overflow: "hidden",
-        ["--portfolio-accent" as any]: "var(--theme-accent)",
-      }}
+    return (
+      <section
+        id="portfolio"
+        ref={sectionRef as any}
+        style={{
+          background: "transparent",
+          paddingTop: "5rem",
+          paddingBottom: "5rem",
+          position: "relative",
+          overflow: "hidden",
+          ["--portfolio-accent" as any]: "var(--theme-accent)",
+        }}
     >
       <SectionBg variant="mascot-right" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
 
