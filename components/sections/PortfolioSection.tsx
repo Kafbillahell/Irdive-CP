@@ -235,45 +235,7 @@ export default function PortfolioSection() {
   const initialIndex = Math.floor(PORTFOLIO_ITEMS.length / 2);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
 
-  const tapLockRef = useRef<number | null>(null);
-  const lastTapTargetRef = useRef<number | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const scrollAnimationRef = useRef<number | null>(null);
-  const smoothCenter = useRef<number | null>(null);
-  const targetScrollCenter = useRef<number | null>(null);
-  const programmaticIndex = useRef<number | null>(null);
-  const candidateIndex = useRef<number | null>(null);
-  const stableFrames = useRef<number>(0);
-  const readyRef = useRef(false); // becomes true after the initial instant centering
-
-  const carouselItems = [
-    { ...PORTFOLIO_ITEMS[PORTFOLIO_ITEMS.length - 1], clone: true, realIndex: PORTFOLIO_ITEMS.length - 1 },
-    ...PORTFOLIO_ITEMS.map((item, index) => ({ ...item, clone: false, realIndex: index })),
-    { ...PORTFOLIO_ITEMS[0], clone: true, realIndex: 0 },
-  ];
-
-  const resetTapState = () => {
-    if (tapLockRef.current) window.clearTimeout(tapLockRef.current);
-    lastTapTargetRef.current = null;
-    tapLockRef.current = null;
-  };
-
-  const handleCardTap = (index: number) => {
-    if (tapLockRef.current) window.clearTimeout(tapLockRef.current);
-
-    if (lastTapTargetRef.current !== index) {
-      lastTapTargetRef.current = index;
-      tapLockRef.current = window.setTimeout(() => {
-        resetTapState();
-      }, 320);
-      return;
-    }
-
-    resetTapState();
-    goToIndex(index);
-  };
-
-  // behavior: "smooth" for user-triggered navigation, "auto" (instant) for initial mount
+  // Simple centering helper — uses native smooth scroll for light weight animation
   const goToIndex = (index: number, behavior: ScrollBehavior = "smooth") => {
     const slider = sliderRef.current;
     setActiveIndex(index);
@@ -281,48 +243,10 @@ export default function PortfolioSection() {
     const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
     if (!target) return;
     const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
-    const center = target.offsetLeft + target.offsetWidth / 2;
-
-    smoothCenter.current = center;
-    targetScrollCenter.current = center;
-    programmaticIndex.current = index;
-    candidateIndex.current = index;
-    stableFrames.current = 0;
-
-    if (scrollAnimationRef.current) {
-      cancelAnimationFrame(scrollAnimationRef.current);
-      scrollAnimationRef.current = null;
-    }
-
-    const originalSnap = slider.style.scrollSnapType;
-    slider.style.scrollSnapType = "none";
-
-    if (behavior === "smooth") {
-      const startLeft = slider.scrollLeft;
-      const distance = left - startLeft;
-      const duration = 420;
-      const startTime = performance.now();
-
-      const step = (now: number) => {
-        const elapsed = Math.min(1, (now - startTime) / duration);
-        const ease = 1 - Math.pow(1 - elapsed, 3);
-        slider.scrollLeft = startLeft + distance * ease;
-        if (elapsed < 1) {
-          scrollAnimationRef.current = requestAnimationFrame(step);
-        } else {
-          scrollAnimationRef.current = null;
-          slider.style.scrollSnapType = originalSnap || "x mandatory";
-        }
-      };
-
-      scrollAnimationRef.current = requestAnimationFrame(step);
-    } else {
-      slider.scrollLeft = left;
-      slider.style.scrollSnapType = originalSnap || "x mandatory";
-    }
+    slider.scrollTo({ left, behavior });
   };
 
-  // ── Instant centering BEFORE paint, so the carousel never visibly starts at card 1 ──
+  // Center to initial index before paint
   useLayoutEffect(() => {
     const slider = sliderRef.current;
     if (!slider || PORTFOLIO_ITEMS.length <= 1) return;
@@ -330,116 +254,42 @@ export default function PortfolioSection() {
     if (target) {
       const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
       slider.scrollTo({ left, behavior: "auto" });
-      smoothCenter.current = target.offsetLeft + target.offsetWidth / 2;
-      candidateIndex.current = initialIndex;
-      stableFrames.current = 0;
     }
-    readyRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Single RAF loop: drives BOTH the 3D transform AND the "active" highlight together,
-  //     so they can never fall out of sync. Clones are always forced inactive/dim. ──
+  // Lightweight scroll handler to update active index
   useEffect(() => {
-    if (shouldReduce || !sliderRef.current) return;
     const slider = sliderRef.current;
-
-    const run = () => {
-      const sliderRect = slider.getBoundingClientRect();
-      const targetCenter = slider.scrollLeft + sliderRect.width / 2;
-
-      const isProgrammatic = programmaticIndex.current !== null;
-      if (smoothCenter.current == null) smoothCenter.current = targetCenter;
-      if (isProgrammatic) {
-        smoothCenter.current = targetCenter;
-      } else {
-        smoothCenter.current = smoothCenter.current + (targetCenter - smoothCenter.current) * 0.12;
-      }
-
-      const center = targetCenter;
-
-      const allCards = Array.from(slider.querySelectorAll<HTMLElement>(".pf-card-wrapper"));
-      const realCards = allCards.filter((c) => c.dataset.idx !== undefined);
-      const realCenters = realCards.map((c) => c.offsetLeft + c.offsetWidth / 2);
-
-      allCards.forEach((card) => {
-        const isClone = card.dataset.idx === undefined;
-        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-        const norm = Math.max(-1, Math.min(1, (cardCenter - center) / (sliderRect.width / 2)));
-        const absNorm = Math.abs(norm);
-
-        const rotateY = -norm * 24;
-        const rotateX = Math.min(6, absNorm * 5);
-        const translateZ = 140 * absNorm;
-        const scale = 0.92 + absNorm * 0.12;
-
-        card.style.transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
-        card.style.transformStyle = "preserve-3d";
-
-        const newZ = Math.round(absNorm * 200) + 1;
-        if (card.dataset.z !== String(newZ)) {
-          card.style.zIndex = String(isClone ? Math.min(newZ, 2) : newZ);
-          card.dataset.z = String(newZ);
-        }
-
-        // Opacity/blur highlight computed from the SAME real-time position used for the
-        // transform above — this is what keeps the "active" look perfectly in sync.
-        if (isClone) {
-          card.style.opacity = "0.5";
-          card.style.filter = "grayscale(80%) blur(6px)";
-        } else {
-          const isFocused = absNorm < 0.12;
-          card.style.opacity = isFocused ? "1" : "0.88";
-          card.style.filter = isFocused ? "none" : "blur(1px)";
-        }
-      });
-
-      if (realCenters.length > 0) {
-        let minIdx = 0;
-        let minDist = Math.abs(realCenters[0] - center);
-        for (let i = 1; i < realCenters.length; i++) {
-          const d = Math.abs(realCenters[i] - center);
+    if (!slider) return;
+    let rafId: number | null = null;
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        const rect = slider.getBoundingClientRect();
+        const center = slider.scrollLeft + rect.width / 2;
+        const cards = Array.from(slider.querySelectorAll<HTMLElement>("[data-idx]"));
+        let closest = 0;
+        let minDist = Infinity;
+        cards.forEach((c) => {
+          const idx = Number(c.dataset.idx);
+          const cCenter = c.offsetLeft + c.offsetWidth / 2;
+          const d = Math.abs(cCenter - center);
           if (d < minDist) {
             minDist = d;
-            minIdx = i;
+            closest = idx;
           }
-        }
-
-        const closestEl = realCards[minIdx];
-        const realIndex = closestEl ? Number(closestEl.dataset.idx) : minIdx;
-        let resolvedIndex = realIndex;
-
-        if (programmaticIndex.current !== null && targetScrollCenter.current !== null) {
-            const distanceToTarget = Math.abs(targetCenter - targetScrollCenter.current);
-            if (distanceToTarget > 4) {
-              resolvedIndex = programmaticIndex.current;
-            } else {
-              programmaticIndex.current = null;
-              targetScrollCenter.current = null;
-            }
-          }
-
-          if (candidateIndex.current === resolvedIndex) {
-            stableFrames.current += 1;
-          } else {
-            candidateIndex.current = resolvedIndex;
-            stableFrames.current = 0;
-          }
-
-          if (readyRef.current && stableFrames.current >= 3) {
-            setActiveIndex((prev) => (prev !== resolvedIndex ? resolvedIndex : prev));
-          }
-        }
-
-        rafRef.current = requestAnimationFrame(run);
-      };
-
-      rafRef.current = requestAnimationFrame(run);
-      return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      };
-    }, [shouldReduce]);
+        });
+        setActiveIndex((prev) => (prev !== closest ? closest : prev));
+        rafId = null;
+      });
+    };
+    slider.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      slider.removeEventListener("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
 
     // Update accent color smoothly when active index changes
     useEffect(() => {
@@ -517,8 +367,6 @@ export default function PortfolioSection() {
                 padding: "2rem 5vw 4rem 5vw",
                 overflowX: "hidden",
                 scrollSnapType: "x mandatory",
-                perspective: 1400,
-                perspectiveOrigin: "50% 50%",
                 overscrollBehaviorX: "contain",
                 touchAction: "pan-y",
               }}
@@ -528,55 +376,42 @@ export default function PortfolioSection() {
                 }
               }}
             >
-              {carouselItems.map((item, i) => {
-                const isClone = item.clone;
-                // Di mobile (touch device), card sama sekali tidak merespons sentuhan/klik —
-                // supaya scroll halaman vertikal berjalan normal tanpa efek "ketarik".
-                // Navigasi tetap bisa lewat bubble indicator di bawah.
-                const isInteractive = !isClone && !isTouch;
-
-                return (
-                  <div
-                    key={`${item.id}-${i}`}
-                    className="pf-card-wrapper"
-                    data-idx={isClone ? undefined : item.realIndex}
-                    role={isInteractive ? "button" : undefined}
-                    aria-hidden={isClone ? true : undefined}
-                    tabIndex={isInteractive ? 0 : -1}
-                    onKeyDown={
-                      isInteractive
-                        ? (e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              goToIndex(item.realIndex);
+                {PORTFOLIO_ITEMS.map((item, idx) => {
+                  const isInteractive = !isTouch;
+                  return (
+                    <div
+                      key={item.id}
+                      className="pf-card-wrapper"
+                      data-idx={idx}
+                      role={isInteractive ? "button" : undefined}
+                      tabIndex={isInteractive ? 0 : -1}
+                      onKeyDown={
+                        isInteractive
+                          ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                goToIndex(idx);
+                              }
                             }
-                          }
-                        : undefined
-                    }
-                    onClick={
-                      isInteractive
-                        ? () => handleCardTap(item.realIndex)
-                        : undefined
-                    }
-                    style={{
-                      flexShrink: 0,
-                      transition: "opacity 0.3s ease, filter 0.3s ease",
-                      scrollSnapAlign: "center",
-                      cursor: isInteractive ? "pointer" : "default",
-                      willChange: "transform",
-                      // Kunci perbaikan: di mobile, card tidak menangkap event apa pun
-                      // (klik, tap, drag) — sentuhan tembus ke halaman untuk scroll biasa.
-                      pointerEvents: isClone || isTouch ? "none" : "auto",
-                      touchAction: isClone || isTouch ? "auto" : "pan-y",
-                      userSelect: "none",
-                      WebkitTapHighlightColor: "transparent",
-                      boxShadow: isClone ? "inset 0 -10px 40px rgba(0,0,0,0.45)" : undefined,
-                    }}
-                  >
-                    <PortfolioCard item={item} index={item.realIndex} />
-                  </div>
-                );
-              })}
+                          : undefined
+                      }
+                      onClick={isInteractive ? () => goToIndex(idx) : undefined}
+                      style={{
+                        flexShrink: 0,
+                        transition: "opacity 0.3s ease, filter 0.3s ease",
+                        scrollSnapAlign: "center",
+                        cursor: isInteractive ? "pointer" : "default",
+                        willChange: "transform",
+                        pointerEvents: isTouch ? "none" : "auto",
+                        touchAction: isTouch ? "auto" : "pan-y",
+                        userSelect: "none",
+                        WebkitTapHighlightColor: "transparent",
+                      }}
+                    >
+                      <PortfolioCard item={item} index={idx} />
+                    </div>
+                  );
+                })}
             </div>
 
             {/* 3D Floating Bubble Pagination Indicators */}
