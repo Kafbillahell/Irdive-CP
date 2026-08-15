@@ -66,6 +66,30 @@ const PORTFOLIO_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
+function getClosestCardIndex(slider: HTMLDivElement) {
+  const cards = Array.from(slider.querySelectorAll<HTMLElement>("[data-idx]"));
+  if (!cards.length) return 0;
+
+  const sliderRect = slider.getBoundingClientRect();
+  const sliderCenter = sliderRect.left + sliderRect.width / 2;
+
+  let closest = 0;
+  let minDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card) => {
+    const rect = card.getBoundingClientRect();
+    const cardCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(cardCenter - sliderCenter);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closest = Number(card.dataset.idx ?? 0);
+    }
+  });
+
+  return closest;
+}
+
 function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -232,11 +256,22 @@ export default function PortfolioSection() {
   const isTouch = useIsTouchDevice();
   const initialIndex = Math.floor(PORTFOLIO_ITEMS.length / 2);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const ignoreScrollUpdateRef = useRef(false);
+  const ignoreTimeoutRef = useRef<number | null>(null);
 
   // Simple centering helper — uses native smooth scroll for light weight animation
   const goToIndex = (index: number, behavior: ScrollBehavior = "smooth") => {
     const slider = sliderRef.current;
     setActiveIndex(index);
+
+    if (ignoreTimeoutRef.current) {
+      window.clearTimeout(ignoreTimeoutRef.current);
+    }
+    ignoreScrollUpdateRef.current = true;
+    ignoreTimeoutRef.current = window.setTimeout(() => {
+      ignoreScrollUpdateRef.current = false;
+    }, 350);
+
     if (!slider) return;
     const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
     if (!target) return;
@@ -260,32 +295,31 @@ export default function PortfolioSection() {
   useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
+
     let rafId: number | null = null;
     const onScroll = () => {
+      if (ignoreScrollUpdateRef.current) return;
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
-        const rect = slider.getBoundingClientRect();
-        const center = slider.scrollLeft + rect.width / 2;
-        const cards = Array.from(slider.querySelectorAll<HTMLElement>("[data-idx]"));
-        let closest = 0;
-        let minDist = Infinity;
-        cards.forEach((c) => {
-          const idx = Number(c.dataset.idx);
-          const cCenter = c.offsetLeft + c.offsetWidth / 2;
-          const d = Math.abs(cCenter - center);
-          if (d < minDist) {
-            minDist = d;
-            closest = idx;
-          }
-        });
+        const closest = getClosestCardIndex(slider);
         setActiveIndex((prev) => (prev !== closest ? closest : prev));
         rafId = null;
       });
     };
+
+    const syncInitialState = () => {
+      const closest = getClosestCardIndex(slider);
+      setActiveIndex((prev) => (prev !== closest ? closest : prev));
+    };
+
+    syncInitialState();
     slider.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       slider.removeEventListener("scroll", onScroll);
       if (rafId) cancelAnimationFrame(rafId);
+      if (ignoreTimeoutRef.current) {
+        window.clearTimeout(ignoreTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -363,10 +397,11 @@ export default function PortfolioSection() {
                 display: "flex",
                 gap: "1.5rem",
                 padding: "2rem 5vw 4rem 5vw",
-                overflowX: "hidden",
+                overflowX: "auto",
                 scrollSnapType: "x mandatory",
                 overscrollBehaviorX: "contain",
                 touchAction: "pan-y",
+                WebkitOverflowScrolling: "touch",
               }}
               onWheel={(e) => {
                 if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
@@ -459,6 +494,7 @@ export default function PortfolioSection() {
         .hide-scroll {
           scrollbar-width: none;
           -ms-overflow-style: none;
+          overflow-y: hidden;
         }
         .hide-scroll::-webkit-scrollbar {
           display: none;
