@@ -16,7 +16,6 @@ function useIsTouchDevice() {
     return (
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
-      navigator.msMaxTouchPoints > 0 ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches
     );
   });
@@ -28,7 +27,6 @@ function useIsTouchDevice() {
       setIsTouch(
         "ontouchstart" in window ||
           navigator.maxTouchPoints > 0 ||
-          navigator.msMaxTouchPoints > 0 ||
           mq.matches
       );
     };
@@ -291,26 +289,26 @@ export default function PortfolioSection() {
     };
   }, []);
 
-    // Update accent color smoothly when active index changes
-    useEffect(() => {
-      const color = PORTFOLIO_ITEMS[activeIndex]?.accentColor ?? "var(--theme-accent)";
-      if (sectionRef.current) {
-        sectionRef.current.style.setProperty("--portfolio-accent", color);
-      }
-    }, [activeIndex]);
+  // Update accent color smoothly when active index changes
+  useEffect(() => {
+    const color = PORTFOLIO_ITEMS[activeIndex]?.accentColor ?? "var(--theme-accent)";
+    if (sectionRef.current) {
+      sectionRef.current.style.setProperty("--portfolio-accent", color);
+    }
+  }, [activeIndex]);
 
-    return (
-      <section
-        id="portfolio"
-        ref={sectionRef as any}
-        style={{
-          background: "transparent",
-          paddingTop: "5rem",
-          paddingBottom: "5rem",
-          position: "relative",
-          overflow: "hidden",
-          ["--portfolio-accent" as any]: "var(--theme-accent)",
-        }}
+  return (
+    <section
+      id="portfolio"
+      ref={sectionRef as any}
+      style={{
+        background: "transparent",
+        paddingTop: "5rem",
+        paddingBottom: "5rem",
+        position: "relative",
+        overflow: "hidden",
+        ["--portfolio-accent" as any]: "var(--theme-accent)",
+      }}
     >
       <SectionBg variant="mascot-right" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
 
@@ -376,42 +374,42 @@ export default function PortfolioSection() {
                 }
               }}
             >
-                {PORTFOLIO_ITEMS.map((item, idx) => {
-                  const isInteractive = !isTouch;
-                  return (
-                    <div
-                      key={item.id}
-                      className="pf-card-wrapper"
-                      data-idx={idx}
-                      role={isInteractive ? "button" : undefined}
-                      tabIndex={isInteractive ? 0 : -1}
-                      onKeyDown={
-                        isInteractive
-                          ? (e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                goToIndex(idx);
-                              }
+              {PORTFOLIO_ITEMS.map((item, idx) => {
+                const isInteractive = !isTouch;
+                return (
+                  <div
+                    key={item.id}
+                    className="pf-card-wrapper"
+                    data-idx={idx}
+                    role={isInteractive ? "button" : undefined}
+                    tabIndex={isInteractive ? 0 : -1}
+                    onKeyDown={
+                      isInteractive
+                        ? (e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              goToIndex(idx);
                             }
-                          : undefined
-                      }
-                      onClick={isInteractive ? () => goToIndex(idx) : undefined}
-                      style={{
-                        flexShrink: 0,
-                        transition: "opacity 0.3s ease, filter 0.3s ease",
-                        scrollSnapAlign: "center",
-                        cursor: isInteractive ? "pointer" : "default",
-                        willChange: "transform",
-                        pointerEvents: isTouch ? "none" : "auto",
-                        touchAction: isTouch ? "auto" : "pan-y",
-                        userSelect: "none",
-                        WebkitTapHighlightColor: "transparent",
-                      }}
-                    >
-                      <PortfolioCard item={item} index={idx} />
-                    </div>
-                  );
-                })}
+                          }
+                        : undefined
+                    }
+                    onClick={isInteractive ? () => goToIndex(idx) : undefined}
+                    style={{
+                      flexShrink: 0,
+                      transition: "opacity 0.3s ease, filter 0.3s ease",
+                      scrollSnapAlign: "center",
+                      cursor: isInteractive ? "pointer" : "default",
+                      willChange: "transform",
+                      pointerEvents: isTouch ? "none" : "auto",
+                      touchAction: isTouch ? "auto" : "pan-y",
+                      userSelect: "none",
+                      WebkitTapHighlightColor: "transparent",
+                    }}
+                  >
+                    <PortfolioCard item={item} index={idx} />
+                  </div>
+                );
+              })}
             </div>
 
             {/* 3D Floating Bubble Pagination Indicators */}
