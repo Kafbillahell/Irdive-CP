@@ -164,7 +164,7 @@ export const CONTACT_INFO = {
   whatsapp: "6285721326004",
   email: "irdive.tech@gmail.com",
   instagram: "@irdive.tech",
-  tiktok: "@irdive.tech",
+  tiktok: "https://www.tiktok.com/@irdive.tech?is_from_webapp=1&sender_device=pc",
   location: "Indonesia",
   waMessage:
     "Halo IRDIVE! Saya tertarik dengan layanan kalian dan ingin diskusi lebih lanjut soal project saya.",
