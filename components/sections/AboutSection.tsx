@@ -41,7 +41,7 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
+      style={{ background: "transparent", paddingTop: "3.4rem", paddingBottom: "3.5rem", position: "relative", overflow: "hidden" }}
     >
       <SectionBg variant="mascot-left" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
       <div className="container">
@@ -59,10 +59,10 @@ export default function AboutSection() {
           {/* Left col */}
           <div>
             <RevealBlock delay={0}>
-              <span className="label-tag" style={{ display: "block", marginBottom: "1.25rem", color: "var(--theme-accent)" }}>
+              <span className="label-tag" style={{ display: "block", marginBottom: "1.2rem", color: "var(--theme-accent)" }}>
                 Tentang IRDIVE
               </span>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 480 }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", letterSpacing: "-0.01em", color: "var(--theme-text)", maxWidth: 480, margin: 0 }}>
                 Bukan sekadar<br />
                 <span style={{ color: "var(--theme-accent)" }}>vendor</span><br />
                 Mitra digital
@@ -87,7 +87,7 @@ export default function AboutSection() {
         </div>
 
         {/* Story */}
-        <RevealBlock delay={0.08} style={{ marginBottom: "4rem" }}>
+        <RevealBlock delay={0.08} style={{ marginTop: "1.25rem", marginBottom: "4rem" }}>
           <p
             style={{
               fontSize: "1.15rem",
@@ -95,6 +95,7 @@ export default function AboutSection() {
               opacity: 0.8,
               lineHeight: 1.8,
               maxWidth: 680,
+              margin: 0,
             }}
           >
             {ABOUT.story}
