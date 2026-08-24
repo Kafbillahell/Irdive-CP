@@ -2,8 +2,6 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { SERVICES, type Service } from "@/lib/content";
 import SectionBg from "@/components/ui/SectionBg";
@@ -54,177 +52,29 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
 
 function ServiceCard({ service, index }: { service: Service; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const shouldReduce = useReducedMotion();
-
-  useGSAP(() => {
-    if (shouldReduce) return;
-    const mm = gsap.matchMedia();
-    
-    mm.add("(hover: hover) and (pointer: fine)", () => {
-      const xTo = gsap.quickTo(glowRef.current, "x", { duration: 0.4, ease: "power3" });
-      const yTo = gsap.quickTo(glowRef.current, "y", { duration: 0.4, ease: "power3" });
-
-      const handleMove = (e: MouseEvent) => {
-        const rect = ref.current?.getBoundingClientRect();
-        if(!rect) return;
-        xTo(e.clientX - rect.left);
-        yTo(e.clientY - rect.top);
-      };
-
-      const handleEnter = () => gsap.to(glowRef.current, { opacity: 1, duration: 0.3 });
-      const handleLeave = () => gsap.to(glowRef.current, { opacity: 0, duration: 0.3 });
-
-      ref.current?.addEventListener("mousemove", handleMove);
-      ref.current?.addEventListener("mouseenter", handleEnter);
-      ref.current?.addEventListener("mouseleave", handleLeave);
-      
-      return () => {
-        ref.current?.removeEventListener("mousemove", handleMove);
-        ref.current?.removeEventListener("mouseenter", handleEnter);
-        ref.current?.removeEventListener("mouseleave", handleLeave);
-      }
-    });
-
-    // Mobile fallback: Shimmer pulse via ScrollTrigger
-    mm.add("(hover: none)", () => {
-      // Glow stays at center pulsing
-      gsap.set(glowRef.current, { x: "50%", y: "50%", xPercent: -50, yPercent: -50, opacity: 0 });
-      gsap.to(glowRef.current, {
-        opacity: 0.6,
-        scale: 1.2,
-        duration: 2,
-        yoyo: true,
-        repeat: -1,
-        ease: "sine.inOut",
-        scrollTrigger: {
-          trigger: ref.current,
-          start: "top center",
-          end: "bottom center",
-          toggleActions: "play pause resume pause",
-        }
-      });
-    });
-
-  }, { scope: ref, dependencies: [shouldReduce] });
-
-  const xDir = index % 2 === 0 ? -30 : 30;
 
   return (
     <motion.div
       ref={ref}
-      initial={shouldReduce ? {} : { opacity: 0, x: xDir, y: 20 }}
-      animate={inView ? { opacity: 1, x: 0, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: 0.05 * (index % 3), ease: EASING }}
-      style={{
-        background: "transparent",
-        border: "1px solid var(--theme-border)",
-        borderRadius: service.featured ? 20 : 16,
-        position: "relative",
-        overflow: "hidden",
-        cursor: "default",
-        transition: "border-color 0.25s, box-shadow 0.25s, transform 0.25s",
-      }}
-      onMouseEnter={(e: React.MouseEvent) => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "var(--theme-accent)";
-        el.style.transform = "translateY(-4px)";
-      }}
-      onMouseLeave={(e: React.MouseEvent) => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "var(--theme-border)";
-        el.style.transform = "translateY(0)";
-      }}
-      className={service.featured ? "service-featured service-card" : "service-card"}
+      initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay: 0.06 * (index % 3), ease: EASING }}
+      className={`svc-card ${service.featured ? "svc-featured" : ""}`}
     >
-      {/* Magnetic Glow Tracker */}
-      <div 
-        ref={glowRef}
-        style={{
-          position: "absolute",
-          top: 0, left: 0,
-          width: 300, height: 300,
-          background: "radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 60%)",
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-          opacity: 0,
-          zIndex: 0
-        }}
-      />
-      {/* Animated left blue border */}
-      <div
-        className="left-bar"
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 3,
-          background: "#2196F3",
-          borderRadius: "16px 0 0 16px",
-          opacity: 0,
-          transition: "opacity 0.2s",
-        }}
-      />
-
       {/* Featured badge */}
       {service.featured && (
-        <span
-          style={{
-            position: "absolute",
-            top: "1.5rem",
-            right: "1.5rem",
-            background: "rgba(255,255,255,0.1)",
-            color: "var(--theme-text)",
-            border: "1px solid var(--theme-border)",
-            fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            padding: "2px 6px",
-            borderRadius: 20,
-            zIndex: 1
-          }}
-        >
-          Paling Populer
-        </span>
+        <span className="svc-badge">Paling Populer</span>
       )}
 
       {/* Icon */}
-      <div
-        className="svc-icon"
-        style={{
-          borderRadius: 14,
-          background: "rgba(255,255,255,0.05)",
-          color: "var(--theme-text)",
-          border: "1px solid var(--theme-border)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "0.75rem",
-          transition: "background 0.2s, color 0.2s, transform 0.2s",
-          position: "relative", zIndex: 1
-        }}
-      >
+      <div className="svc-icon">
         {SERVICE_ICONS[service.id]}
       </div>
 
-      <h3
-        className="svc-title"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 700,
-          color: "var(--theme-text)",
-          marginBottom: "0.4rem",
-          letterSpacing: "-0.02em",
-          position: "relative", zIndex: 1,
-          lineHeight: 1.2
-        }}
-      >
-        {service.title}
-      </h3>
-      <p className="svc-desc" style={{ color: "var(--theme-text)", opacity: 0.7, lineHeight: 1.4, position: "relative", zIndex: 1 }}>{service.desc}</p>
+      <h3 className="svc-title">{service.title}</h3>
+      <p className="svc-desc">{service.desc}</p>
     </motion.div>
   );
 }
@@ -237,7 +87,8 @@ export default function ServicesSection() {
   return (
     <section
       id="services"
-      style={{ background: "transparent", paddingTop: "5rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
+      className="services-section"
+      aria-label="Services"
     >
       <SectionBg variant="mascot-right" mascotSrc="/mascot-1.png" mascotOpacity={0.045} dark={true} />
       <div className="container">
@@ -253,21 +104,14 @@ export default function ServicesSection() {
               Layanan
             </span>
             <h2 className="display-2" style={{ color: "var(--theme-text)", maxWidth: 520 }}>
-              Apa yang bisa<br />
-              kami <span style={{ color: "var(--theme-accent)" }}>bantu?</span>
+              Apa yang kami<br />
+              <span style={{ color: "var(--theme-accent)" }}>kerjakan</span>
             </h2>
           </motion.div>
         </div>
 
-        {/* Asymmetric grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "1.25rem",
-          }}
-          className="services-grid"
-        >
+        {/* Services grid */}
+        <div className="services-grid">
           {SERVICES.map((service, i) => (
             <ServiceCard key={service.id} service={service} index={i} />
           ))}
@@ -275,29 +119,128 @@ export default function ServicesSection() {
       </div>
 
       <style>{`
-        .services-grid {
-          grid-template-columns: 1fr 1fr !important;
-          gap: 0.5rem !important;
+        .services-section {
+          position: relative;
+          overflow: hidden;
+          padding-top: 5rem;
+          padding-bottom: 5rem;
         }
-        .service-card { padding: 0.65rem !important; }
-        .svc-icon { width: 28px !important; height: 28px !important; svg { width: 18px; height: 18px; } }
-        .svc-title { font-size: clamp(0.85rem, 2vw, 1.15rem); }
-        .svc-desc { font-size: clamp(0.7rem, 1.8vw, 0.9rem); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        
+        .services-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.75rem;
+        }
+        .svc-card {
+          position: relative;
+          background: transparent;
+          border: 1px solid var(--theme-border);
+          border-radius: 16px;
+          padding: 1rem;
+          overflow: hidden;
+          cursor: default;
+          transition: border-color 0.25s, box-shadow 0.3s, transform 0.25s;
+        }
+        .svc-card:hover {
+          border-color: var(--theme-accent);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+        .svc-featured {
+          grid-column: 1 / -1;
+          padding: 1.5rem;
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.03);
+        }
+        .svc-badge {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--theme-text);
+          border: 1px solid var(--theme-border);
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 3px 10px;
+          border-radius: 20px;
+          z-index: 1;
+        }
+        .svc-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.05);
+          color: var(--theme-text);
+          border: 1px solid var(--theme-border);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 0.75rem;
+          transition: background 0.2s, color 0.2s;
+        }
+        .svc-icon svg {
+          width: 20px;
+          height: 20px;
+        }
+        .svc-card:hover .svc-icon {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--theme-accent);
+        }
+        .svc-title {
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: clamp(0.88rem, 2.2vw, 1.15rem);
+          color: var(--theme-text);
+          margin-bottom: 0.4rem;
+          letter-spacing: -0.02em;
+          line-height: 1.25;
+        }
+        .svc-desc {
+          color: var(--theme-text);
+          opacity: 0.7;
+          line-height: 1.5;
+          font-size: clamp(0.72rem, 1.8vw, 0.9rem);
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
         @media (min-width: 768px) {
-          .services-grid { gap: 1.25rem !important; }
-          .service-card { padding: 1.75rem !important; }
-          .svc-icon { width: 52px !important; height: 52px !important; svg { width: 28px; height: 28px; } }
-          .svc-title { font-size: 1.35rem !important; }
-          .svc-desc { font-size: 0.95rem !important; display: block; }
-          .service-featured {
-            grid-column: span 2;
-            padding: 2.5rem !important;
+          .services-grid {
+            gap: 1.25rem;
+          }
+          .svc-card {
+            padding: 1.75rem;
+          }
+          .svc-featured {
+            padding: 2.5rem;
+          }
+          .svc-icon {
+            width: 52px;
+            height: 52px;
+          }
+          .svc-icon svg {
+            width: 28px;
+            height: 28px;
+          }
+          .svc-title {
+            font-size: 1.25rem;
+          }
+          .svc-desc {
+            font-size: 0.95rem;
+            display: block;
+            -webkit-line-clamp: unset;
           }
         }
+
         @media (min-width: 1024px) {
           .services-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
+            grid-template-columns: repeat(3, 1fr);
+          }
+          .svc-featured {
+            grid-column: span 3;
           }
         }
       `}</style>

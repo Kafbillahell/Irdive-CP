@@ -1,36 +1,22 @@
 'use client';
 
-import { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
 import SectionBg from "@/components/ui/SectionBg";
-import { HERO } from "@/lib/content";
+import { HERO, STATS } from "@/lib/content";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
-function HeroParallaxMascot() {
-  return (
-    <div
-      className="hero-mascot-col"
-      style={{ position: "relative", pointerEvents: "none" }}
-    >
-      <div
-        className="mascot-inner"
-        style={{ position: "relative", zIndex: 1, width: "100%", display: "flex", justifyContent: "center", pointerEvents: "none" }}
-      >
-        <MascotCarousel />
-      </div>
-    </div>
-  );
-}
-
 export default function HeroSection() {
   const shouldReduceMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+  const inView = useInView(sectionRef, { once: true, margin: "-40px" });
 
   const fadeUp = (delay: number) => ({
     initial: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 },
-    animate: { opacity: 1, y: 0 },
+    animate: inView ? { opacity: 1, y: 0 } : {},
     transition: { duration: 0.7, delay, ease: EASING },
   });
 
@@ -40,57 +26,41 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
+      ref={sectionRef}
       className="hero-section"
-      style={{
-        background: "transparent",
-        color: "var(--theme-text)",
-        overflow: "visible",
-        position: "relative",
-        minHeight: "auto",
-        display: "flex",
-        alignItems: "flex-start",
-      }}
+      aria-label="Hero"
     >
       <SectionBg variant="full" mascotSrc="/mascot-2.png" mascotOpacity={0.05} />
 
-      <div className="container" style={{ position: "relative", zIndex: 1, width: "100%" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "1.5rem",
-            alignItems: "center",
-          }}
-          className="hero-grid"
-        >
-          {/* Mascot — mobile: top (order -1), desktop: right (order 2) */}
-          <HeroParallaxMascot />
-
-          {/* Text content — mobile: below mascot, desktop: left column (order 1) */}
-          <div className="hero-text-col" style={{ maxWidth: 640 }}>
+      <div className="container hero-container">
+        <div className="hero-grid">
+          {/* Text content */}
+          <div className="hero-text-col">
             {/* Label tag */}
-            <motion.div {...fadeUp(0)} style={{ marginBottom: "2.5rem" }}>
-              <span className="label-tag">Studio Digital</span>
+            <motion.div {...fadeUp(0)}>
+              <span className="label-tag" style={{ color: "var(--theme-accent)", display: "block", marginBottom: "1.5rem" }}>
+                Studio Digital
+              </span>
             </motion.div>
 
             {/* Headline */}
-            <h1 style={{ marginBottom: "1.5rem" }}>
+            <h1 className="hero-headline">
               {headlineLines.map((line, i) => (
                 <motion.span
                   key={i}
-                  {...fadeUp(0.15 + i * 0.08)}
-                  style={{ fontFamily: "var(--font-display)", display: "block", fontSize: "clamp(2rem, 7vw, 6rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.03em", color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)" }}
+                  {...fadeUp(0.12 + i * 0.08)}
+                  className="hero-headline-line"
+                  style={{
+                    color: i === 1 ? "var(--theme-accent)" : "var(--theme-text)",
+                  }}
                 >
                   {line}
                 </motion.span>
               ))}
             </h1>
 
-            {/* Subheadline */}
-            <motion.p
-              {...fadeUp(0.3)}
-              style={{ fontFamily: "var(--font-body)", fontSize: "clamp(0.9rem, 1.8vw, 1.35rem)", color: "var(--theme-text)", opacity: 0.85, lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: 580 }}
-            >
+            {/* Supporting copy */}
+            <motion.p {...fadeUp(0.28)} className="hero-subheadline">
               {subheadlineParts.map((part, index) =>
                 part === "IRDIVE" ? (
                   <strong key={index} style={{ fontWeight: 700, color: "inherit" }}>
@@ -102,80 +72,209 @@ export default function HeroSection() {
               )}
             </motion.p>
 
+            {/* CTA buttons */}
+            <motion.div {...fadeUp(0.38)} className="hero-cta-row">
+              <a href={HERO.ctaPrimary.href} className="hero-btn-primary">
+                {HERO.ctaPrimary.label}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+              </a>
+              <a href={HERO.ctaSecondary.href} className="hero-btn-ghost">
+                {HERO.ctaSecondary.label}
+              </a>
+            </motion.div>
+
+            {/* Divider */}
+            <motion.div {...fadeUp(0.46)} className="hero-divider" />
+
+            {/* Stats */}
+            <motion.div {...fadeUp(0.5)} className="hero-stats">
+              {STATS.map((stat, i) => (
+                <div key={stat.label} className="hero-stat-item">
+                  {i > 0 && <div className="hero-stat-separator" aria-hidden="true" />}
+                  <div className="hero-stat-content">
+                    <span className="hero-stat-value">
+                      {stat.value}{stat.suffix}
+                    </span>
+                    <span className="hero-stat-label">{stat.label}</span>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Mascot */}
+          <div className="hero-mascot-col" aria-hidden="true">
+            <div className="mascot-inner">
+              <MascotCarousel />
+            </div>
           </div>
         </div>
       </div>
 
       <style>{`
         .hero-section {
-          padding-top: 3.2rem;
-          padding-bottom: 1.2rem;
+          position: relative;
+          overflow: visible;
+          min-height: auto;
+          padding-top: 5rem;
+          padding-bottom: 2rem;
+        }
+        .hero-container {
+          position: relative;
+          z-index: 1;
         }
         .hero-grid {
-          grid-template-columns: 1fr !important;
-          gap: 0.3rem !important;
-        }
-        .hero-mascot-col {
-          display: none;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+          align-items: center;
         }
         .hero-text-col {
           order: 1;
-          max-width: 100% !important;
+          max-width: 100%;
+        }
+        .hero-headline {
+          margin-bottom: 1.5rem;
+        }
+        .hero-headline-line {
+          display: block;
+          font-family: var(--font-display);
+          font-size: clamp(2.25rem, 10vw, 3.5rem);
+          font-weight: 800;
+          line-height: 1.12;
+          letter-spacing: -0.03em;
+        }
+        .hero-subheadline {
+          font-family: var(--font-body);
+          font-size: clamp(0.95rem, 3.5vw, 1.2rem);
+          color: var(--theme-text);
+          opacity: 0.8;
+          line-height: 1.7;
+          margin-bottom: 2rem;
+          max-width: 540px;
+        }
+        .hero-cta-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          margin-bottom: 0;
+        }
+        .hero-btn-primary {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: linear-gradient(135deg, #2196F3, #1976D2);
+          color: white;
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: 0.95rem;
+          padding: 0.85rem 1.75rem;
+          border-radius: var(--radius-md);
+          text-decoration: none;
+          box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
+          transition: transform 0.2s var(--ease-out-spring), box-shadow 0.2s;
+        }
+        .hero-btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(33, 150, 243, 0.4);
+        }
+        .hero-btn-ghost {
+          display: inline-flex;
+          align-items: center;
+          background: transparent;
+          color: var(--theme-text);
+          font-family: var(--font-display);
+          font-weight: 600;
+          font-size: 0.95rem;
+          padding: 0.85rem 1.75rem;
+          border-radius: var(--radius-md);
+          border: 1.5px solid var(--theme-border);
+          text-decoration: none;
+          transition: border-color 0.2s, color 0.2s, transform 0.2s;
+        }
+        .hero-btn-ghost:hover {
+          border-color: var(--theme-accent);
+          color: var(--theme-accent);
+          transform: translateY(-2px);
+        }
+        .hero-divider {
+          height: 1px;
+          background: var(--theme-border);
+          margin: 2.5rem 0;
+          max-width: 540px;
+        }
+        .hero-stats {
+          display: flex;
+          gap: 0;
+          flex-wrap: wrap;
+        }
+        .hero-stat-item {
+          display: flex;
+          align-items: center;
+          gap: 0;
+        }
+        .hero-stat-separator {
+          width: 1px;
+          height: 40px;
+          background: var(--theme-border);
+          margin: 0 1.25rem;
+          flex-shrink: 0;
+        }
+        .hero-stat-content {
+          display: flex;
+          flex-direction: column;
+        }
+        .hero-stat-value {
+          font-family: var(--font-display);
+          font-weight: 800;
+          font-size: clamp(1.75rem, 5vw, 2.5rem);
+          letter-spacing: -0.03em;
+          line-height: 1;
+          color: var(--theme-text);
+        }
+        .hero-stat-label {
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: var(--theme-text);
+          opacity: 0.6;
+          margin-top: 0.25rem;
+        }
+        .hero-mascot-col {
+          display: none;
+          pointer-events: none;
+        }
+        .mascot-inner {
           width: 100%;
-          margin-top: 0;
+          display: flex;
+          justify-content: center;
         }
-        .hero-text-col h1 {
-          margin-top: 0.25rem !important;
-          margin-bottom: 2rem !important;
-        }
-        .hero-text-col h1 span {
-          font-size: clamp(2.5rem, 13vw, 4.05rem) !important;
-          line-height: 1.3 !important;
-        }
-        .hero-text-col p {
-          font-size: clamp(0.9rem, 4vw, 1.15rem) !important;
-          margin-bottom: 1.5rem !important;
-        }
-        .mascot-inner { width: 100%; }
-        .hero-text-col .label-tag {
-          display: block !important;
-          font-size: 0.8rem !important;
-          letter-spacing: 0.08em !important;
-          font-weight: 700 !important;
-          color: var(--theme-accent) !important;
-        }
-        .hero-btn { font-size: 0.9rem !important; padding: 0.75rem 1.25rem !important; }
-        
-        @media (min-width: 640px) {
-          .hero-btn { font-size: 1rem !important; padding: 1rem 1.75rem !important; }
-        }
+
         @media (min-width: 960px) {
           .hero-section {
-            padding-top: calc(64px + 1rem);
-            padding-bottom: 1rem;
+            padding-top: calc(72px + 2rem);
+            padding-bottom: 3rem;
           }
           .hero-grid {
-            grid-template-columns: 50% 50% !important;
-            gap: 2rem !important;
-            align-items: center;
-          }
-          .hero-mascot-col {
-            display: flex !important;
-            order: 2 !important;
-            transform: translateY(-1.5rem) !important;
+            grid-template-columns: 55% 45%;
+            gap: 2rem;
           }
           .hero-text-col {
-            order: 1 !important;
-            max-width: 640px !important;
-            margin-top: 0 !important;
+            max-width: 640px;
+            order: 1;
           }
-          .hero-text-col h1 span {
-            font-size: clamp(2rem, 7vw, 6rem) !important;
-            line-height: 1.28 !important;
+          .hero-mascot-col {
+            display: flex;
+            order: 2;
           }
-          .hero-text-col p {
-            font-size: clamp(0.9rem, 1.8vw, 1.35rem) !important;
-            margin-bottom: 3rem !important;
+          .hero-headline-line {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 1.08;
+          }
+          .hero-subheadline {
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+          }
+          .hero-stat-separator {
+            margin: 0 2rem;
           }
         }
       `}</style>

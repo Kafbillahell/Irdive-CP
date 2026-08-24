@@ -1,522 +1,295 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { PORTFOLIO_ITEMS, type PortfolioItem } from "@/lib/content";
+import { PORTFOLIO_ITEMS } from "@/lib/content";
 import SectionBg from "@/components/ui/SectionBg";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
-// Deteksi apakah perangkat menggunakan touch (mobile) — dipakai untuk mematikan
-// interaksi klik/geser pada card di mobile agar tidak mengganggu scroll halaman.
-function useIsTouchDevice() {
-  const [isTouch, setIsTouch] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return (
-      "ontouchstart" in window ||
-      navigator.maxTouchPoints > 0 ||
-      window.matchMedia("(hover: none) and (pointer: coarse)").matches
-    );
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
-    const update = () => {
-      setIsTouch(
-        "ontouchstart" in window ||
-          navigator.maxTouchPoints > 0 ||
-          mq.matches
-      );
-    };
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
-  return isTouch;
-}
-
-// Icon per portfolio item category
-const PORTFOLIO_ICONS: Record<string, React.ReactNode> = {
-  featured: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  ),
-  website: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <path d="M8 21h8M12 17v4" />
-    </svg>
-  ),
-  system: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
-      <rect x="5" y="2" width="14" height="20" rx="2" />
-      <path d="M9 7h6M9 11h6M9 15h4" />
-    </svg>
-  ),
-  landing: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width={28} height={28}>
-      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-      <path d="M2 17l10 5 10-5" />
-      <path d="M2 12l10 5 10-5" />
-    </svg>
-  ),
-};
-
-function getClosestCardIndex(slider: HTMLDivElement) {
-  const cards = Array.from(slider.querySelectorAll<HTMLElement>("[data-idx]"));
-  if (!cards.length) return 0;
-
-  const sliderRect = slider.getBoundingClientRect();
-  const sliderCenter = sliderRect.left + sliderRect.width / 2;
-
-  let closest = 0;
-  let minDistance = Number.POSITIVE_INFINITY;
-
-  cards.forEach((card) => {
-    const rect = card.getBoundingClientRect();
-    const cardCenter = rect.left + rect.width / 2;
-    const distance = Math.abs(cardCenter - sliderCenter);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closest = Number(card.dataset.idx ?? 0);
-    }
-  });
-
-  return closest;
-}
-
-function PortfolioCard({ item, index }: { item: PortfolioItem; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const shouldReduce = useReducedMotion();
-
-  const bgImage = item.imageSrc ?? "/assets/image.png";
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.55, delay: 0.07 * (index % 3), ease: EASING }}
-      style={{
-        flexShrink: 0,
-        scrollSnapAlign: "center",
-        width: "85vw",
-        maxWidth: 380,
-        height: 480,
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: 24,
-        border: "1px solid rgba(255,255,255,0.1)",
-        background: "#0A0A0A",
-        boxShadow: "0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
-        cursor: "default",
-        transformStyle: "flat",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        userSelect: "none",
-        WebkitTapHighlightColor: "transparent",
-        touchAction: "pan-y",
-        pointerEvents: "auto",
-      }}
-    >
-      {/* ── Background Image ── */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `url(${bgImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: 0,
-          transition: "transform 0.5s ease-out",
-          filter: "brightness(0.8)",
-        }}
-        className="pf-bg-img"
-      />
-
-      {/* ── Gradient Overlay for Text Readability ── */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 60%, rgba(0,0,0,0.95) 100%)",
-          zIndex: 0,
-        }}
-      />
-
-      {/* ── Card Content ── */}
-      <div style={{ padding: "2rem", position: "relative", zIndex: 2, display: "flex", flexDirection: "column" }}>
-        {/* Category tag */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: `rgba(255,255,255,0.1)`,
-              border: `1px solid rgba(255,255,255,0.2)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#FFF",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            {PORTFOLIO_ICONS[item.category]}
-          </div>
-          <span
-            style={{
-              fontSize: "0.65rem",
-              fontWeight: 700,
-              letterSpacing: "0.10em",
-              textTransform: "uppercase",
-              color: "#FFF",
-              background: `rgba(255,255,255,0.1)`,
-              border: `1px solid rgba(255,255,255,0.1)`,
-              padding: "4px 12px",
-              borderRadius: 20,
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            {item.categoryLabel}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h3
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
-            color: "#FFF",
-            marginBottom: "0.5rem",
-            lineHeight: 1.2,
-            textShadow: "0 2px 10px rgba(0,0,0,0.5)",
-          }}
-        >
-          {item.title}
-        </h3>
-
-        {/* Description */}
-        <p
-          style={{
-            fontSize: "clamp(0.8rem, 2vw, 0.95rem)",
-            color: "rgba(255,255,255,0.75)",
-            lineHeight: 1.6,
-          }}
-        >
-          {item.description}
-        </p>
-
-        {/* Tech tags */}
-        <div
-          style={{
-            display: "flex",
-            gap: "0.4rem",
-            flexWrap: "wrap",
-            marginTop: "1.25rem",
-          }}
-        >
-          {item.tech.map((t) => (
-            <span
-              key={t}
-              style={{
-                fontSize: "0.65rem",
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.8)",
-                background: "rgba(255,255,255,0.1)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                backdropFilter: "blur(10px)",
-                padding: "4px 10px",
-                borderRadius: 6,
-              }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function PortfolioSection() {
   const headerRef = useRef(null);
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement | null>(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
   const shouldReduce = useReducedMotion();
-  const isTouch = useIsTouchDevice();
-  const initialIndex = Math.floor(PORTFOLIO_ITEMS.length / 2);
-  const [activeIndex, setActiveIndex] = useState(initialIndex);
-  const ignoreScrollUpdateRef = useRef(false);
-  const ignoreTimeoutRef = useRef<number | null>(null);
 
-  // Simple centering helper — uses native smooth scroll for light weight animation
-  const goToIndex = (index: number, behavior: ScrollBehavior = "smooth") => {
-    const slider = sliderRef.current;
-    setActiveIndex(index);
-
-    if (ignoreTimeoutRef.current) {
-      window.clearTimeout(ignoreTimeoutRef.current);
-    }
-    ignoreScrollUpdateRef.current = true;
-    ignoreTimeoutRef.current = window.setTimeout(() => {
-      ignoreScrollUpdateRef.current = false;
-    }, 350);
-
-    if (!slider) return;
-    const target = slider.querySelector<HTMLElement>(`[data-idx='${index}']`);
-    if (!target) return;
-    const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
-    slider.scrollTo({ left, behavior });
-  };
-
-  // Center to initial index before paint
-  useLayoutEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider || PORTFOLIO_ITEMS.length <= 1) return;
-    const target = slider.querySelector<HTMLElement>(`[data-idx='${initialIndex}']`);
-    if (target) {
-      const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
-      slider.scrollTo({ left, behavior: "auto" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Lightweight scroll handler to update active index
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    let rafId: number | null = null;
-    const onScroll = () => {
-      if (ignoreScrollUpdateRef.current) return;
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        const closest = getClosestCardIndex(slider);
-        setActiveIndex((prev) => (prev !== closest ? closest : prev));
-        rafId = null;
-      });
-    };
-
-    const syncInitialState = () => {
-      const closest = getClosestCardIndex(slider);
-      setActiveIndex((prev) => (prev !== closest ? closest : prev));
-    };
-
-    syncInitialState();
-    slider.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      slider.removeEventListener("scroll", onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-      if (ignoreTimeoutRef.current) {
-        window.clearTimeout(ignoreTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Update accent color smoothly when active index changes
-  useEffect(() => {
-    const color = PORTFOLIO_ITEMS[activeIndex]?.accentColor ?? "var(--theme-accent)";
-    if (sectionRef.current) {
-      sectionRef.current.style.setProperty("--portfolio-accent", color);
-    }
-  }, [activeIndex]);
+  // Split items: first = featured (Zans Café), rest = secondary
+  const featured = PORTFOLIO_ITEMS.find((p) => p.category === "featured") ?? PORTFOLIO_ITEMS[0];
+  const secondary = PORTFOLIO_ITEMS.filter((p) => p.id !== featured.id);
 
   return (
     <section
       id="portfolio"
-      ref={sectionRef as any}
-      style={{
-        background: "transparent",
-        paddingTop: "5rem",
-        paddingBottom: "5rem",
-        position: "relative",
-        overflow: "hidden",
-        ["--portfolio-accent" as any]: "var(--theme-accent)",
-      }}
+      className="portfolio-section"
+      aria-label="Portfolio"
     >
       <SectionBg variant="mascot-right" mascotSrc="/mascot-3.png" mascotOpacity={0.04} />
 
-      <div style={{ position: "relative", zIndex: 1 }}>
-        <div className="container">
-          {/* Header */}
-          <motion.div
-            ref={headerRef}
-            initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, ease: EASING }}
-            style={{ marginBottom: "3rem" }}
-          >
-            <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
-              Portfolio
-            </span>
-            <h2
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(2rem, 4vw, 3.5rem)",
-                lineHeight: 1.1,
-                letterSpacing: "-0.03em",
-                color: "var(--theme-text)",
-                marginBottom: "1rem",
-              }}
-            >
-              Karya yang kami <span style={{ color: "var(--theme-accent)" }}>banggakan</span>
-            </h2>
+      <div className="container" style={{ position: "relative", zIndex: 1 }}>
+        {/* Header */}
+        <motion.div
+          ref={headerRef}
+          initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: EASING }}
+          style={{ marginBottom: "3rem" }}
+        >
+          <span className="label-tag" style={{ display: "block", marginBottom: "0.75rem", color: "var(--theme-accent)" }}>
+            Portfolio
+          </span>
+          <h2 className="pf-heading">
+            Karya yang kami <span style={{ color: "var(--theme-accent)" }}>banggakan</span>
+          </h2>
+          <p className="pf-subtext">
+            Proyek-proyek yang mencerminkan cara kerja dan standar kualitas yang kami terapkan di setiap kolaborasi.
+          </p>
+        </motion.div>
 
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "1.5rem", flexDirection: "column" }}>
-              <p style={{ color: "var(--theme-text)", opacity: 0.6, maxWidth: 480, fontSize: "0.95rem", lineHeight: 1.6, margin: 0 }}>
-                Proyek-proyek yang mencerminkan cara kerja dan standar kualitas yang kami terapkan di setiap kolaborasi.
-              </p>
+        {/* Editorial Grid */}
+        <div className="pf-grid">
+          {/* Featured card — Zans Café */}
+          <motion.div
+            className="pf-card pf-card-featured"
+            initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1, ease: EASING }}
+          >
+            {featured.imageSrc && (
+              <div className="pf-card-image">
+                <Image
+                  src={featured.imageSrc}
+                  alt={featured.title}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 55vw"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+            )}
+            <div className="pf-card-overlay" />
+            <div className="pf-card-content">
+              <div className="pf-card-meta">
+                <span className="pf-card-category">{featured.categoryLabel}</span>
+              </div>
+              <h3 className="pf-card-title">{featured.title}</h3>
+              <p className="pf-card-desc">{featured.description}</p>
+              <div className="pf-card-tech">
+                {featured.tech.map((t) => (
+                  <span key={t} className="pf-tech-tag">{t}</span>
+                ))}
+              </div>
             </div>
           </motion.div>
-        </div>
 
-        {/* ── Main Outer Frame ("Layar") ── */}
-        <div className="container" style={{ marginTop: "1rem" }}>
-          <div
-            style={{
-              position: "relative",
-              margin: "0 auto",
-              maxWidth: 1200,
-            }}
-          >
-            {/* 3D Carousel Track */}
-            <div
-              ref={sliderRef}
-              className="hide-scroll"
-              style={{
-                display: "flex",
-                gap: "1.5rem",
-                padding: "2rem 5vw 4rem 5vw",
-                overflowX: "auto",
-                scrollSnapType: "x mandatory",
-                overscrollBehaviorX: "contain",
-                touchAction: "pan-y",
-                WebkitOverflowScrolling: "touch",
-              }}
-              onWheel={(e) => {
-                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              {PORTFOLIO_ITEMS.map((item, idx) => {
-                const isInteractive = !isTouch;
-                return (
-                  <div
-                    key={item.id}
-                    className="pf-card-wrapper"
-                    data-idx={idx}
-                    role={isInteractive ? "button" : undefined}
-                    tabIndex={isInteractive ? 0 : -1}
-                    onKeyDown={
-                      isInteractive
-                        ? (e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              goToIndex(idx);
-                            }
-                          }
-                        : undefined
-                    }
-                    onClick={isInteractive ? () => goToIndex(idx) : undefined}
-                    style={{
-                      flexShrink: 0,
-                      transition: "opacity 0.3s ease, filter 0.3s ease",
-                      scrollSnapAlign: "center",
-                      cursor: isInteractive ? "pointer" : "default",
-                      willChange: "transform",
-                      pointerEvents: isTouch ? "none" : "auto",
-                      touchAction: isTouch ? "auto" : "pan-y",
-                      userSelect: "none",
-                      WebkitTapHighlightColor: "transparent",
-                    }}
-                  >
-                    <PortfolioCard item={item} index={idx} />
+          {/* Secondary cards — stacked on right (desktop) */}
+          <div className="pf-secondary-stack">
+            {secondary.map((item, i) => (
+              <motion.div
+                key={item.id}
+                className="pf-card pf-card-secondary"
+                initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
+                animate={headerInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.55, delay: 0.2 + i * 0.1, ease: EASING }}
+              >
+                {item.imageSrc && (
+                  <div className="pf-card-image">
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 40vw"
+                      style={{ objectFit: "cover" }}
+                    />
                   </div>
-                );
-              })}
-            </div>
-
-            {/* 3D Floating Bubble Pagination Indicators */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "12px",
-                marginTop: "-1rem",
-                paddingBottom: "3rem",
-              }}
-            >
-              {PORTFOLIO_ITEMS.map((item, i) => {
-                const isActive = i === activeIndex;
-                return (
-                  <button
-                    key={`bubble-${item.id}`}
-                    type="button"
-                    aria-label={`Lihat portofolio ${item.title}`}
-                    className="pf-bubble-indicator"
-                    onClick={() => goToIndex(i)}
-                    style={{
-                      height: isActive ? 14 : 12,
-                      width: isActive ? 14 : 12,
-                      borderRadius: "50%",
-                      background: isActive ? "var(--portfolio-accent, var(--theme-accent))" : "rgba(0,0,0,0.06)",
-                      backdropFilter: "blur(4px)",
-                      boxShadow: isActive
-                        ? "0 6px 12px rgba(33, 150, 243, 0.25), inset 0 -2px 6px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,0.7)"
-                        : "inset 0 1px 2px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.05), 0 2px 5px rgba(0,0,0,0.05)",
-                      border: "1px solid rgba(0,0,0,0.08)",
-                      transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s, box-shadow 0.4s, width 0.3s, height 0.3s",
-                      transform: isActive ? "scale(1.35)" : "scale(1)",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  />
-                );
-              })}
-            </div>
+                )}
+                <div className="pf-card-overlay" />
+                <div className="pf-card-content">
+                  <div className="pf-card-meta">
+                    <span className="pf-card-category">{item.categoryLabel}</span>
+                  </div>
+                  <h3 className="pf-card-title pf-card-title-sm">{item.title}</h3>
+                  <p className="pf-card-desc pf-card-desc-sm">{item.description}</p>
+                  <div className="pf-card-tech">
+                    {item.tech.map((t) => (
+                      <span key={t} className="pf-tech-tag">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
 
       <style>{`
-        .hide-scroll {
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-          overflow-y: hidden;
+        .portfolio-section {
+          position: relative;
+          overflow: hidden;
+          padding-top: 5rem;
+          padding-bottom: 5rem;
         }
-        .hide-scroll::-webkit-scrollbar {
-          display: none;
+        .pf-heading {
+          font-family: var(--font-display);
+          font-size: clamp(2rem, 4vw, 3.25rem);
+          line-height: 1.1;
+          letter-spacing: -0.03em;
+          color: var(--theme-text);
+          margin-bottom: 1rem;
+        }
+        .pf-subtext {
+          color: var(--theme-text);
+          opacity: 0.6;
+          max-width: 480px;
+          font-size: 0.95rem;
+          line-height: 1.6;
+          margin: 0;
         }
 
-        .pf-card-wrapper:hover .pf-bg-img {
+        /* Grid: stacked on mobile, editorial on desktop */
+        .pf-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.25rem;
+        }
+        .pf-secondary-stack {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.25rem;
+        }
+
+        /* Card base */
+        .pf-card {
+          position: relative;
+          overflow: hidden;
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #0A0A0A;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          cursor: default;
+          transition: transform 0.3s var(--ease-out-spring), box-shadow 0.3s;
+        }
+        .pf-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+        }
+        .pf-card-featured {
+          min-height: 380px;
+        }
+        .pf-card-secondary {
+          min-height: 260px;
+        }
+        .pf-card-image {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .pf-card-image img {
+          transition: transform 0.5s ease-out;
+        }
+        .pf-card:hover .pf-card-image img {
           transform: scale(1.05);
         }
+        .pf-card-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.08) 0%,
+            rgba(0, 0, 0, 0.7) 50%,
+            rgba(0, 0, 0, 0.92) 100%
+          );
+          z-index: 1;
+        }
+        .pf-card-content {
+          position: relative;
+          z-index: 2;
+          padding: 1.75rem;
+        }
+        .pf-card-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+        }
+        .pf-card-category {
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #FFF;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          padding: 4px 12px;
+          border-radius: 20px;
+          backdrop-filter: blur(10px);
+        }
+        .pf-card-title {
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: clamp(1.25rem, 3vw, 1.75rem);
+          color: #FFF;
+          margin-bottom: 0.5rem;
+          line-height: 1.2;
+        }
+        .pf-card-title-sm {
+          font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+        }
+        .pf-card-desc {
+          font-size: clamp(0.82rem, 2vw, 0.95rem);
+          color: rgba(255, 255, 255, 0.75);
+          line-height: 1.6;
+        }
+        .pf-card-desc-sm {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .pf-card-tech {
+          display: flex;
+          gap: 0.4rem;
+          flex-wrap: wrap;
+          margin-top: 1rem;
+        }
+        .pf-tech-tag {
+          font-size: 0.65rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.8);
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          padding: 4px 10px;
+          border-radius: 6px;
+        }
 
-        @media (hover: none) and (pointer: coarse), (hover: none) {
-          .pf-card-wrapper,
-          .pf-card-wrapper * {
-            pointer-events: none !important;
-            touch-action: auto !important;
-            -webkit-user-drag: none !important;
-            -webkit-tap-highlight-color: transparent !important;
+        @media (min-width: 768px) {
+          .pf-grid {
+            grid-template-columns: 1.2fr 1fr;
+            gap: 1.5rem;
           }
+          .pf-card-featured {
+            min-height: 520px;
+          }
+          .pf-card-secondary {
+            min-height: 250px;
+          }
+          .pf-secondary-stack {
+            gap: 1.5rem;
+          }
+          .pf-card-content {
+            padding: 2rem;
+          }
+          .pf-card-desc-sm {
+            -webkit-line-clamp: 3;
+          }
+        }
 
-          .pf-card-wrapper:hover .pf-bg-img,
-          .pf-card-wrapper:active .pf-bg-img {
-            transform: none !important;
-            transition: none !important;
+        @media (min-width: 1024px) {
+          .pf-card-featured {
+            min-height: 560px;
           }
         }
       `}</style>
