@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
 import SectionBg from "@/components/ui/SectionBg";
-import { HERO, STATS } from "@/lib/content";
+import { HERO } from "@/lib/content";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
@@ -71,35 +71,6 @@ export default function HeroSection() {
                 )
               )}
             </motion.p>
-
-            {/* CTA buttons */}
-            <motion.div {...fadeUp(0.38)} className="hero-cta-row">
-              <a href={HERO.ctaPrimary.href} className="hero-btn-primary">
-                {HERO.ctaPrimary.label}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-              </a>
-              <a href={HERO.ctaSecondary.href} className="hero-btn-ghost">
-                {HERO.ctaSecondary.label}
-              </a>
-            </motion.div>
-
-            {/* Divider */}
-            <motion.div {...fadeUp(0.46)} className="hero-divider" />
-
-            {/* Stats */}
-            <motion.div {...fadeUp(0.5)} className="hero-stats">
-              {STATS.map((stat, i) => (
-                <div key={stat.label} className="hero-stat-item">
-                  {i > 0 && <div className="hero-stat-separator" aria-hidden="true" />}
-                  <div className="hero-stat-content">
-                    <span className="hero-stat-value">
-                      {stat.value}{stat.suffix}
-                    </span>
-                    <span className="hero-stat-label">{stat.label}</span>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
           </div>
 
           {/* Mascot */}
@@ -150,94 +121,8 @@ export default function HeroSection() {
           color: var(--theme-text);
           opacity: 0.8;
           line-height: 1.7;
-          margin-bottom: 2rem;
-          max-width: 540px;
-        }
-        .hero-cta-row {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
           margin-bottom: 0;
-        }
-        .hero-btn-primary {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: linear-gradient(135deg, #2196F3, #1976D2);
-          color: white;
-          font-family: var(--font-display);
-          font-weight: 700;
-          font-size: 0.95rem;
-          padding: 0.85rem 1.75rem;
-          border-radius: var(--radius-md);
-          text-decoration: none;
-          box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
-          transition: transform 0.2s var(--ease-out-spring), box-shadow 0.2s;
-        }
-        .hero-btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(33, 150, 243, 0.4);
-        }
-        .hero-btn-ghost {
-          display: inline-flex;
-          align-items: center;
-          background: transparent;
-          color: var(--theme-text);
-          font-family: var(--font-display);
-          font-weight: 600;
-          font-size: 0.95rem;
-          padding: 0.85rem 1.75rem;
-          border-radius: var(--radius-md);
-          border: 1.5px solid var(--theme-border);
-          text-decoration: none;
-          transition: border-color 0.2s, color 0.2s, transform 0.2s;
-        }
-        .hero-btn-ghost:hover {
-          border-color: var(--theme-accent);
-          color: var(--theme-accent);
-          transform: translateY(-2px);
-        }
-        .hero-divider {
-          height: 1px;
-          background: var(--theme-border);
-          margin: 2.5rem 0;
           max-width: 540px;
-        }
-        .hero-stats {
-          display: flex;
-          gap: 0;
-          flex-wrap: wrap;
-        }
-        .hero-stat-item {
-          display: flex;
-          align-items: center;
-          gap: 0;
-        }
-        .hero-stat-separator {
-          width: 1px;
-          height: 40px;
-          background: var(--theme-border);
-          margin: 0 1.25rem;
-          flex-shrink: 0;
-        }
-        .hero-stat-content {
-          display: flex;
-          flex-direction: column;
-        }
-        .hero-stat-value {
-          font-family: var(--font-display);
-          font-weight: 800;
-          font-size: clamp(1.75rem, 5vw, 2.5rem);
-          letter-spacing: -0.03em;
-          line-height: 1;
-          color: var(--theme-text);
-        }
-        .hero-stat-label {
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: var(--theme-text);
-          opacity: 0.6;
-          margin-top: 0.25rem;
         }
         .hero-mascot-col {
           display: none;
@@ -272,9 +157,6 @@ export default function HeroSection() {
           }
           .hero-subheadline {
             font-size: clamp(1rem, 1.5vw, 1.25rem);
-          }
-          .hero-stat-separator {
-            margin: 0 2rem;
           }
         }
       `}</style>

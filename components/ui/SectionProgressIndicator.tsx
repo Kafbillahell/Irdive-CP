@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { SECTION_IDS } from "@/lib/content";
 
 const SECTION_LABELS: Record<string, string> = {
-  home: "Home",
+  hero: "Home",
   about: "About",
   services: "Services",
   portfolio: "Portfolio",
@@ -14,13 +14,16 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export default function SectionProgressIndicator() {
-  const [activeSection, setActiveSection] = useState("home");
+  const [activeSection, setActiveSection] = useState("hero");
 
   useEffect(() => {
     const sectionMap: Record<string, number> = {};
     const observers: IntersectionObserver[] = [];
 
-    SECTION_IDS.forEach((id) => {
+    // Check for both hero / home ID
+    const targetIds = ["hero", "about", "services", "portfolio", "contact", "partnerships"];
+
+    targetIds.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
       const obs = new IntersectionObserver(
@@ -39,13 +42,16 @@ export default function SectionProgressIndicator() {
   }, []);
 
   const handleClick = (id: string) => {
-    const el = document.getElementById(id);
+    const targetId = id === "home" ? "hero" : id;
+    const el = document.getElementById(targetId) || document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
+  const sections = ["hero", "about", "services", "portfolio", "contact", "partnerships"];
+
   return (
-    <div
-      className="hidden md:flex"
+    <nav
+      className="hidden md:flex section-nav-indicator"
       style={{
         position: "fixed",
         right: "1.5rem",
@@ -55,10 +61,17 @@ export default function SectionProgressIndicator() {
         flexDirection: "column",
         gap: "10px",
         alignItems: "center",
+        padding: "8px 6px",
+        borderRadius: "20px",
+        background: "rgba(15, 23, 42, 0.35)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
       }}
       aria-label="Section navigation"
     >
-      {SECTION_IDS.map((id) => {
+      {sections.map((id) => {
         const isActive = activeSection === id;
         return (
           <button
@@ -70,7 +83,7 @@ export default function SectionProgressIndicator() {
               background: "none",
               border: "none",
               cursor: "pointer",
-              padding: 4,
+              padding: "4px 2px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -80,7 +93,8 @@ export default function SectionProgressIndicator() {
               animate={{
                 width: isActive ? 10 : 6,
                 height: isActive ? 10 : 6,
-                backgroundColor: isActive ? "#2196F3" : "#D1D5DB",
+                backgroundColor: isActive ? "#2196F3" : "rgba(255, 255, 255, 0.4)",
+                boxShadow: isActive ? "0 0 8px #2196F3" : "none",
               }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
               style={{
@@ -91,6 +105,6 @@ export default function SectionProgressIndicator() {
           </button>
         );
       })}
-    </div>
+    </nav>
   );
 }
