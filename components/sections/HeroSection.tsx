@@ -1,9 +1,9 @@
 'use client';
 
+import Image from "next/image";
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import MascotCarousel from "@/components/logo-maskot/MascotCarousel";
 import SectionBg from "@/components/ui/SectionBg";
 import { HERO } from "@/lib/content";
 
@@ -76,7 +76,15 @@ export default function HeroSection() {
           {/* Mascot */}
           <div className="hero-mascot-col" aria-hidden="true">
             <div className="mascot-inner">
-              <MascotCarousel />
+              <div className="hero-mascot-asset">
+                <Image
+                  src="/mascot-2.png"
+                  alt="IRDIVE mascot with laptop"
+                  fill
+                  priority
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -132,6 +140,13 @@ export default function HeroSection() {
           width: 100%;
           display: flex;
           justify-content: center;
+          align-items: center;
+        }
+        .hero-mascot-asset {
+          position: relative;
+          width: min(100%, 500px);
+          aspect-ratio: 1;
+          filter: drop-shadow(0 25px 40px rgba(33, 150, 243, 0.18));
         }
 
         @media (min-width: 960px) {
@@ -150,6 +165,9 @@ export default function HeroSection() {
           .hero-mascot-col {
             display: flex;
             order: 2;
+          }
+          .hero-mascot-asset {
+            width: min(100%, 600px);
           }
           .hero-headline-line {
             font-size: clamp(2.5rem, 5vw, 4.5rem);
