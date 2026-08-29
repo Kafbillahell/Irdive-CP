@@ -123,11 +123,11 @@ export interface PortfolioItem {
 export const PORTFOLIO_ITEMS: PortfolioItem[] = [
   {
     id: "p1",
-    title: "Zans Café",
+    title: "Zans Cafe",
     category: "featured",
     categoryLabel: "Brand & Experience",
     description:
-      "Visual brand café yang menonjolkan suasana hangat, menu khas, dan pengalaman kuliner yang memorable untuk pengunjung.",
+      "Zans Cafe menghadirkan pengalaman kunjungan yang tenang dan nyaman, dengan sistem yang mempermudah transaksi tanpa mengganggu momen santai pelanggan. Solusi ini dibuat untuk menjaga ritme layanan tetap lancar, santai, dan terasa personal dari awal hingga akhir kunjungan.",
     tech: ["Branding", "UI Design", "Visual Story"],
     span: "wide",
     accentColor: "#1E2328",
@@ -135,11 +135,11 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
   },
   {
     id: "p2",
-    title: "SISAB",
+    title: "Absensi Siswa",
     category: "system",
     categoryLabel: "School Information System",
     description:
-      "Sistem informasi sekolah yang memudahkan pengelolaan data siswa, absensi, dan jadwal dengan tampilan yang rapi dan mudah dipakai.",
+      "Sistem absensi siswa dibuat untuk mendorong kedisiplinan dan tanggung jawab secara konsisten. Dengan proses pencatatan yang lebih rapi dan mudah dipantau, sekolah dapat membangun kebiasaan disiplin sejak dini tanpa menambah beban administrasi yang berlebihan.",
     tech: ["Dashboard", "Data Management", "Web App"],
     span: "normal",
     accentColor: "#1E2328",
@@ -147,11 +147,11 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
   },
   {
     id: "p3",
-    title: "Uang Kas",
+    title: "Aplikasi Uang Kas",
     category: "website",
     categoryLabel: "Cash Management",
     description:
-      "Aplikasi pencatatan kas sederhana yang membantu memantau transaksi, saldo, dan laporan bulanan dengan lebih teratur.",
+      "Aplikasi uang kas hadir untuk menjaga transparansi keuangan dan kepercayaan antaranggota dalam satu kelompok. Dengan riwayat transaksi yang jelas dan mudah dilihat, pengelolaan dana menjadi lebih tertib, akuntabel, dan efektif untuk kebutuhan bersama.",
     tech: ["Finance UI", "Reporting", "Simple Workflow"],
     span: "normal",
     accentColor: "#1E2328",
