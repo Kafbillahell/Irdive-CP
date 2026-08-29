@@ -98,8 +98,8 @@ export default function PartnershipsSection() {
           {/* Marquee container */}
           <div className="marquee-container">
             <div
-              className={shouldReduce ? "" : "marquee-track"}
-              style={{ display: "flex", gap: "0.875rem", paddingBottom: "0.25rem" }}
+              className="marquee-static"
+              style={{ display: "flex", gap: "0.875rem", paddingBottom: "0.25rem", width: "100%", flexWrap: "wrap" }}
             >
               {techDouble.map((tech, i) => (
                 <div key={`${tech.name}-${i}`} className="tech-pill">
@@ -174,6 +174,13 @@ export default function PartnershipsSection() {
           overflow: hidden;
           mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
           -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        }
+        .marquee-static {
+          display: flex;
+          align-items: center;
+          animation: none;
+          transform: none;
+          width: 100%;
         }
         .tech-pill {
           flex-shrink: 0;

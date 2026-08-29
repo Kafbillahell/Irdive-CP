@@ -87,6 +87,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 
 body {
@@ -98,6 +100,12 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+* {
+  max-width: 100%;
 }
 
 img, video {
@@ -121,10 +129,22 @@ button, input, textarea, select {
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--off-white); }
-::-webkit-scrollbar-thumb { background: var(--blue-mid); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
 
 /* ── Typography ────────────────────────────────────────────── */
 .display-1 {
@@ -259,16 +279,13 @@ button, input, textarea, select {
   color: var(--green);
 }
 
-/* ── Marquee animation (Partnerships) ──────────────────────── */
-@keyframes marquee-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.marquee-track {
+/* Marquee motion intentionally disabled so the page remains static at 100% width. */
+.marquee-track,
+.marquee-static {
   display: flex;
-  width: max-content;
-  animation: marquee-scroll 24s linear infinite;
+  width: 100%;
+  animation: none !important;
+  transform: none !important;
 }
 
 .marquee-track:hover {
