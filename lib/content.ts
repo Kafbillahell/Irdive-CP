@@ -170,6 +170,13 @@ export const CONTACT_INFO = {
     "Halo IRDIVE! Saya tertarik dengan layanan kalian dan ingin diskusi lebih lanjut soal project saya.",
 } as const;
 
+export const MAP_LOCATION = {
+  googleMapsQuery:
+    "Perumahan Lembah Permata, Jalan Raya Cianjur Blok E2 No. 6 (Block E2 No. 6.), KAB. CIANJUR - WARUNGKONDANG, JAWA BARAT, ID 43261",
+  address:
+    "Perumahan Lembah Permata, Jalan Raya Cianjur Blok E2 No. 6 (Block E2 No. 6.), KAB. CIANJUR - WARUNGKONDANG, JAWA BARAT, ID 43261",
+} as const;
+
 // ── Partnerships ──────────────────────────────────────────────
 export interface TechBadge {
   name: string;

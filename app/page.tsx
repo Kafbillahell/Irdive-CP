@@ -11,6 +11,7 @@ const ServicesSection = dynamic(() => import("@/components/sections/ServicesSect
 const PortfolioSection = dynamic(() => import("@/components/sections/PortfolioSection"));
 const ContactSection = dynamic(() => import("@/components/sections/ContactSection"));
 const PartnershipsSection = dynamic(() => import("@/components/sections/PartnershipsSection"));
+const MapLocationSection = dynamic(() => import("@/components/sections/MapLocationSection"));
 
 export default function Home() {
   return (
@@ -39,6 +40,10 @@ export default function Home() {
         <ThemeZone bg="#080B13" text="#F9FAFB" accent="#048753" border="#1F2937">
           <ContactSection />
           <PartnershipsSection />
+        </ThemeZone>
+
+        <ThemeZone bg="#FFFFFF" text="#111827" accent="#D13434" border="#E5E7EB">
+          <MapLocationSection />
         </ThemeZone>
       </main>
 
