@@ -8,6 +8,19 @@ import { PORTFOLIO_ITEMS } from "@/lib/content";
 import SectionBg from "@/components/ui/SectionBg";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
+const CARD_PREVIEW_LIMIT = 150;
+
+const getCardPreview = (description: string) => {
+  if (description.length <= CARD_PREVIEW_LIMIT) {
+    return { text: description, isTruncated: false };
+  }
+
+  const trimmed = description.slice(0, CARD_PREVIEW_LIMIT).trimEnd();
+  return {
+    text: `${trimmed}...`,
+    isTruncated: true,
+  };
+};
 
 const PORTFOLIO_DETAILS: Record<string, { description: string }> = {
   p1: {
@@ -57,48 +70,55 @@ export default function PortfolioSection() {
         </motion.div>
 
         <div className="pf-grid">
-          {PORTFOLIO_ITEMS.map((item, index) => (
-            <motion.article
-              key={item.id}
-              className="pf-card"
-              initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, delay: 0.08 * (index + 1), ease: EASING }}
-            >
-              {item.imageSrc && (
-                <div className="pf-card-image">
-                  <Image
-                    src={item.imageSrc}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    style={{ objectFit: "cover" }}
-                  />
+          {PORTFOLIO_ITEMS.map((item, index) => {
+            const preview = getCardPreview(item.description);
+
+            return (
+              <motion.article
+                key={item.id}
+                className="pf-card"
+                initial={shouldReduce ? {} : { opacity: 0, y: 28 }}
+                animate={headerInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.55, delay: 0.08 * (index + 1), ease: EASING }}
+              >
+                {item.imageSrc && (
+                  <div className="pf-card-image">
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                )}
+                <div className="pf-card-overlay" />
+
+                <div className="pf-card-content">
+                  <span className="pf-card-category">{item.categoryLabel}</span>
+                  <h3 className="pf-card-title">{item.title}</h3>
+                  <p className="pf-card-desc">
+                    {preview.text}
+                    {preview.isTruncated && (
+                      <button
+                        type="button"
+                        className="pf-card-read-more"
+                        onClick={() => setSelectedId(item.id)}
+                      >
+                        Selengkapnya
+                      </button>
+                    )}
+                  </p>
+
+                  <div className="pf-card-tech">
+                    {item.tech.map((tech) => (
+                      <span key={tech} className="pf-tech-tag">{tech}</span>
+                    ))}
+                  </div>
                 </div>
-              )}
-              <div className="pf-card-overlay" />
-
-              <div className="pf-card-content">
-                <span className="pf-card-category">{item.categoryLabel}</span>
-                <h3 className="pf-card-title">{item.title}</h3>
-                <p className="pf-card-desc">{item.description}</p>
-
-                <div className="pf-card-tech">
-                  {item.tech.map((tech) => (
-                    <span key={tech} className="pf-tech-tag">{tech}</span>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  className="pf-card-button"
-                  onClick={() => setSelectedId(item.id)}
-                >
-                  Lihat Detail
-                </button>
-              </div>
-            </motion.article>
-          ))}
+              </motion.article>
+            );
+          })}
         </div>
       </div>
 
@@ -212,9 +232,10 @@ export default function PortfolioSection() {
           inset: 0;
           background: linear-gradient(
             to bottom,
-            rgba(6, 10, 16, 0.1) 0%,
-            rgba(6, 10, 16, 0.38) 38%,
-            rgba(6, 10, 16, 0.88) 100%
+            rgba(6, 10, 16, 0.08) 0%,
+            rgba(6, 10, 16, 0.18) 30%,
+            rgba(6, 10, 16, 0.52) 62%,
+            rgba(6, 10, 16, 0.8) 100%
           );
           z-index: 1;
         }
@@ -227,6 +248,12 @@ export default function PortfolioSection() {
           justify-content: flex-end;
           min-height: 420px;
           padding: 1.5rem;
+          background: linear-gradient(
+            to top,
+            rgba(10, 12, 18, 0.5) 0%,
+            rgba(10, 12, 18, 0.16) 28%,
+            rgba(10, 12, 18, 0.04) 100%
+          );
         }
 
         .pf-card-category {
@@ -260,6 +287,23 @@ export default function PortfolioSection() {
           margin-bottom: 1rem;
         }
 
+        .pf-card-read-more {
+          display: inline;
+          margin-left: 0.28rem;
+          padding: 0;
+          border: none;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 500;
+          cursor: pointer;
+          text-decoration: none;
+          transition: opacity 0.2s ease;
+        }
+
+        .pf-card-read-more:hover {
+          opacity: 0.8;
+        }
+
         .pf-card-tech {
           display: flex;
           flex-wrap: wrap;
@@ -279,24 +323,6 @@ export default function PortfolioSection() {
           font-weight: 600;
         }
 
-        .pf-card-button {
-          align-self: flex-start;
-          border: none;
-          border-radius: 999px;
-          background: linear-gradient(135deg, #ffffff 0%, #e7ecff 100%);
-          color: #111827;
-          cursor: pointer;
-          padding: 0.8rem 1.2rem;
-          font-weight: 700;
-          font-size: 0.82rem;
-          box-shadow: 0 12px 25px rgba(255, 255, 255, 0.12);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .pf-card-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 16px 30px rgba(255, 255, 255, 0.16);
-        }
-
         .pf-modal-backdrop {
           position: fixed;
           inset: 0;
@@ -305,15 +331,15 @@ export default function PortfolioSection() {
           backdrop-filter: blur(10px);
           display: grid;
           place-items: center;
-          padding: 1rem;
+          padding: 0.75rem;
         }
 
         .pf-modal {
           position: relative;
           width: min(920px, 100%);
-          max-height: min(88vh, 900px);
+          max-height: min(82vh, 900px);
           overflow: hidden;
-          border-radius: 24px;
+          border-radius: 22px;
           background: #ffffff;
           border: 1px solid rgba(148, 163, 184, 0.2);
           box-shadow: 0 30px 80px rgba(15, 23, 42, 0.32);
@@ -376,6 +402,37 @@ export default function PortfolioSection() {
           color: #374151;
           line-height: 1.8;
           font-size: 0.98rem;
+        }
+
+        @media (max-width: 767px) {
+          .pf-modal-backdrop {
+            padding: 0.5rem;
+            align-items: center;
+          }
+
+          .pf-modal {
+            width: min(100%, 420px);
+            max-height: min(78vh, 720px);
+            border-radius: 18px;
+            margin-top: -1.2rem;
+          }
+
+          .pf-modal-image-wrap {
+            height: 200px;
+          }
+
+          .pf-modal-body {
+            padding: 1.1rem 1rem 1.2rem;
+          }
+
+          .pf-modal-title {
+            font-size: clamp(1.5rem, 7vw, 2rem);
+          }
+
+          .pf-modal-text {
+            font-size: 0.9rem;
+            line-height: 1.7;
+          }
         }
 
         @media (min-width: 768px) {
